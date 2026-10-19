@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>20 Balls in a Spinning Heptagon</title>
+<style>
+  html, body {
+    margin: 0;
+    height: 100%;
+    background: #111318;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  canvas {
+    background: #181b22;
+    border-radius: 8px;
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.6);
+  }
+</style>
+</head>
+<body>
+<canvas id="c" width="720" height="720"></canvas>
+<script>
+(() => {
+  const canvas = document.getElementById('c');
+  const ctx = canvas.getContext('2d');
+
+  // ---------- Configuration ----------
+  const W = 720, H = 720;
+  const CX = W / 2, CY = H / 2;
+  const HEPT_R = 300;                    // heptagon circumradius
+  const SIDES = 7;
+  const OMEGA = 2 * Math.PI / 5;         // 360 degrees per 5 seconds (rad/s)
+  const BALL_R = 18;
+  const GRAVITY = 1000;                  // px/s^2
+  const WALL_E = 0.75;                   // restitution against walls
+  const BALL_E = 0.85;                   // restitution between balls
+  const MU_WALL = 0.35;                  // wall friction coefficient
+  const MU_BALL = 0.15;                  // ball-ball friction coefficient
+  const AIR_DRAG = 0.02;                 // linear drag per second
+  const SPIN_DRAG = 0.3;                 // spin damping per second
+  const SUBSTEPS = 10;
+  const SOLVER_ITERS = 3;
+
+  // Bounce-height limit: speed cap so that v^2 / (2g) stays below the heptagon radius
+  const MAX_SPEED = Math.sqrt(2 * GRAVITY * HEPT_R * 0.85);
+
+  const COLORS = [
+    '#f8b862', '#f6ad49', '#f39800', '#f08300', '#ec6d51',
+    '#ee7948', '#ed6d3d', '#ec6800', '#ee7800', '#eb6238',
+    '#ea5506', '#eb6101', '#e49e61', '#e45e32', '#e17b34',
+    '#dd7a56', '#db8449', '#d66a35', '#c85554', '#d9333f'
+  ];
+
+  // ---------- Balls ----------
+  // Initial positions: a compact, non-overlapping hex cluster at the heptagon center
+  function clusterPositions(n, spacing) {
+    const pts = [];
+    const range = 6;
+    for (let q = -range; q <= range; q++) {
+      for (let r = -range; r <= range; r++) {
+        const x = spacing * (q + r / 2);
+        const y = spacing * (r * Math.sqrt(3) / 2);
+        pts.push({ x, y, d: x * x + y * y });
+      }
+    }
+    pts.sort((a, b) => a.d - b.d);
+    return pts.slice(0, n);
+  }
+
+  const balls = [];
+  const starts = clusterPositions(20, BALL_R * 2 + 1.5);
+  for (let i = 0; i < 20; i++) {
+    balls.push({
+      x: CX + starts[i].x,
+      y: CY + starts[i].y,
+      vx: (Math.random() - 0.5) * 20,
+      vy: 0,
+      angle: 0,      // rotation angle (rad)
+      spin: 0,       // angular velocity (rad/s)
+      r: BALL_R,
+      color: COLORS[i],
+      label: String(i + 1)
+    });
+  }
+
+  let hepAngle = 0;
+
+  // ---------- Geometry ----------
+  function heptagonVertices(angle) {
+    const v = [];
+    for (let i = 0; i < SIDES; i++) {
+      const a = angle + i * 2 * Math.PI / SIDES - Math.PI / 2;
+      v.push({ x: CX + HEPT_R * Math.cos(a), y: CY + HEPT_R * Math.sin(a) });
+    }
+    return v;
+  }
+
+  function clampSpeed(b) {
+    const s = Math.hypot(b.vx, b.vy);
+    if (s > MAX_SPEED) {
+      const k = MAX_SPEED / s;
+      b.vx *= k;
+      b.vy *= k;
+    }
+  }
+
+  // ---------- Collision: ball vs rotating walls ----------
+  function collideWalls(b, verts) {
+    for (let i = 0; i < SIDES; i++) {
+      const a = verts[i];
+      const c = verts[(i + 1) % SIDES];
+      // inward normal (regular polygon: from edge midpoint toward center)
+      let nx = CX - (a.x + c.x) / 2;
+      let ny = CY - (a.y + c.y) / 2;
+      const nl = Math.hypot(nx, ny);
+      nx /= nl; ny /= nl;
+
+      const d = (b.x - a.x) * nx + (b.y - a.y) * ny; // signed distance to wall line
+      if (d < b.r) {
+        // positional correction
+        const pen = b.r - d;
+        b.x += nx * pen;
+        b.y += ny * pen;
+
+        // contact point on the wall and its velocity due to rotation
+        const px = b.x - nx * b.r;
+        const py = b.y - ny * b.r;
+        const wvx = -OMEGA * (py - CY);
+        const wvy = OMEGA * (px - CX);
+
+        // relative velocity
+        const rvx = b.vx - wvx;
+        const rvy = b.vy - wvy;
+        const vn = rvx * nx + rvy * ny;
+
+        if (vn < 0) {
+          // normal impulse (unit mass)
+          const e = Math.abs(vn) < 30 ? 0 : WALL_E; // kill micro-bounces for resting contact
+          const jn = -(1 + e) * vn;
+          b.vx += jn * nx;
+          b.vy += jn * ny;
+
+          // friction impulse including spin (solid disk: I = 0.5 m r^2)
+          const tx = -ny, ty = nx;
+          const vt = rvx * tx + rvy * ty - b.spin * b.r; // slip velocity at contact
+          let jt = -vt / 3;
+          const maxF = MU_WALL * jn;
+          if (jt > maxF) jt = maxF;
+          if (jt < -maxF) jt = -maxF;
+          b.vx += jt * tx;
+          b.vy += jt * ty;
+          b.spin += -2 * jt / b.r;
+
+          clampSpeed(b);
+        }
+      }
+    }
+  }
+
+  // ---------- Collision: ball vs ball ----------
+  function collideBalls(a, b) {
+    let dx = b.x - a.x;
+    let dy = b.y - a.y;
+    const minD = a.r + b.r;
+    let d2 = dx * dx + dy * dy;
+    if (d2 >= minD * minD) return;
+
+    let d = Math.sqrt(d2);
+    if (d < 1e-6) {
+      dx = Math.random() - 0.5;
+      dy = Math.random() - 0.5;
+      d = Math.hypot(dx, dy);
+    }
+    const nx = dx / d, ny = dy / d;
+
+    // positional correction (equal masses)
+    const pen = (minD - d) / 2;
+    a.x -= nx * pen; a.y -= ny * pen;
+    b.x += nx * pen; b.y += ny * pen;
+
+    const rvx = b.vx - a.vx;
+    const rvy = b.vy - a.vy;
+    const vn = rvx * nx + rvy * ny;
+    if (vn >= 0) return;
+
+    const e = Math.abs(vn) < 20 ? 0 : BALL_E;
+    const j = -(1 + e) * vn / 2;
+    a.vx -= j * nx; a.vy -= j * ny;
+    b.vx += j * nx; b.vy += j * ny;
+
+    // friction between surfaces -> spin transfer
+    const tx = -ny, ty = nx;
+    const vt = rvx * tx + rvy * ty - a.r * a.spin - b.r * b.spin;
+    let jt = -vt / 6;
+    const maxF = MU_BALL * j;
+    if (jt > maxF) jt = maxF;
+    if (jt < -maxF) jt = -maxF;
+    b.vx += jt * tx; b.vy += jt * ty;
+    a.vx -= jt * tx; a.vy -= jt * ty;
+    a.spin += -2 * jt / a.r;
+    b.spin += -2 * jt / b.r;
+
+    clampSpeed(a);
+    clampSpeed(b);
+  }
+
+  // ---------- Simulation step ----------
+  function step(dt) {
+    hepAngle += OMEGA * dt;
+    const verts = heptagonVertices(hepAngle);
+
+    const drag = Math.exp(-AIR_DRAG * dt);
+    const spinDrag = Math.exp(-SPIN_DRAG * dt);
+
+    for (const b of balls) {
+      b.vy += GRAVITY * dt;
+      b.vx *= drag;
+      b.vy *= drag;
+      b.spin *= spinDrag;
+      b.x += b.vx * dt;
+      b.y += b.vy * dt;
+      b.angle += b.spin * dt;
+    }
+
+    for (let it = 0; it < SOLVER_ITERS; it++) {
+      for (let i = 0; i < balls.length; i++) {
+        for (let k = i + 1; k < balls.length; k++) {
+          collideBalls(balls[i], balls[k]);
+        }
+      }
+      for (const b of balls) collideWalls(b, verts);
+    }
+  }
+
+  // ---------- Rendering ----------
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+
+    // heptagon
+    const verts = heptagonVertices(hepAngle);
+    ctx.beginPath();
+    ctx.moveTo(verts[0].x, verts[0].y);
+    for (let i = 1; i < SIDES; i++) ctx.lineTo(verts[i].x, verts[i].y);
+    ctx.closePath();
+    ctx.fillStyle = '#1f232c';
+    ctx.fill();
+    ctx.lineWidth = 4;
+    ctx.strokeStyle = '#8fa3c0';
+    ctx.lineJoin = 'round';
+    ctx.stroke();
+
+    // center marker
+    ctx.beginPath();
+    ctx.arc(CX, CY, 3, 0, Math.PI * 2);
+    ctx.fillStyle = '#3a4150';
+    ctx.fill();
+
+    // balls
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.font = 'bold 16px sans-serif';
+    for (const b of balls) {
+      ctx.save();
+      ctx.translate(b.x, b.y);
+
+      ctx.beginPath();
+      ctx.arc(0, 0, b.r, 0, Math.PI * 2);
+      ctx.fillStyle = b.color;
+      ctx.fill();
+      ctx.lineWidth = 1.5;
+      ctx.strokeStyle = 'rgba(0,0,0,0.35)';
+      ctx.stroke();
+
+      // highlight (not rotating, gives a light source feel)
+      ctx.beginPath();
+      ctx.arc(-b.r * 0.35, -b.r * 0.35, b.r * 0.28, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(255,255,255,0.18)';
+      ctx.fill();
+
+      // rotating number shows spin
+      ctx.rotate(b.angle);
+      ctx.fillStyle = '#1a1a1a';
+      ctx.fillText(b.label, 0, 1);
+      ctx.restore();
+    }
+  }
+
+  // ---------- Main loop ----------
+  let last = performance.now();
+  function frame(now) {
+    let dt = (now - last) / 1000;
+    last = now;
+    if (dt > 1 / 30) dt = 1 / 30; // avoid large jumps (e.g. tab switch)
+    const h = dt / SUBSTEPS;
+    for (let i = 0; i < SUBSTEPS; i++) step(h);
+    draw();
+    requestAnimationFrame(frame);
+  }
+  draw();
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>

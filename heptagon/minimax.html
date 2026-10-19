@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spinning Heptagon Ball Physics</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: #060910;
+    display: grid;
+    place-items: center;
+  }
+  canvas {
+    width: min(720px, 100vw);
+    height: min(720px, 100vh);
+    display: block;
+    background: #080b13;
+    box-shadow: 0 24px 80px rgba(0, 0, 0, 0.65);
+  }
+</style>
+</head>
+<body>
+<canvas id="simulation" width="720" height="720" aria-label="Twenty numbered balls bouncing inside a rotating heptagon"></canvas>
+
+<script>
+(() => {
+  "use strict";
+
+  const canvas = document.getElementById("simulation");
+  const ctx = canvas.getContext("2d");
+
+  const SIZE = 720;
+  const CENTER_X = SIZE / 2;
+  const CENTER_Y = SIZE / 2;
+
+  const HEPTAGON_RADIUS = 310;
+  const SIDES = 7;
+  const BALL_RADIUS = 15;
+  const GRAVITY = 900;
+  const ANGULAR_VELOCITY = (Math.PI * 2) / 5; // 360 degrees every 5 seconds
+  const FIXED_STEP = 1 / 240;
+
+  // Every wall rebound rises more than one ball radius, but remains
+  // comfortably below the heptagon's circumradius.
+  const MIN_BOUNCE_RISE = BALL_RADIUS * 2;
+  const MAX_BOUNCE_RISE = HEPTAGON_RADIUS * 0.82;
+  const MIN_BOUNCE_SPEED = Math.sqrt(2 * GRAVITY * MIN_BOUNCE_RISE);
+  const MAX_BOUNCE_SPEED = Math.sqrt(2 * GRAVITY * MAX_BOUNCE_RISE);
+  const MAX_TRAVEL_SPEED = Math.sqrt(2 * GRAVITY * HEPTAGON_RADIUS);
+
+  const COLORS = [
+    "#f8b862", "#f6ad49", "#f39800", "#f08300", "#ec6d51",
+    "#ee7948", "#ed6d3d", "#ec6800", "#ee7800", "#eb6238",
+    "#ea5506", "#eb6101", "#e49e61", "#e45e32", "#e17b34",
+    "#dd7a56", "#db8449", "#d66a35", "#c85554", "#d9333f"
+  ];
+
+  let balls = [];
+  let simulationTime = 0;
+  let polygonAngle = -Math.PI / 2;
+  let polygon = [];
+
+  const clamp = (value, low, high) =>
+    Math.max(low, Math.min(high, value));
+
+  function createPolygon() {
+    polygon = [];
+
+    for (let i = 0; i < SIDES; i++) {
+      const angle = polygonAngle + (i * Math.PI * 2) / SIDES;
+      polygon.push({
+        x: CENTER_X + Math.cos(angle) * HEPTAGON_RADIUS,
+        y: CENTER_Y + Math.sin(angle) * HEPTAGON_RADIUS
+      });
+    }
+  }
+
+  function resetBalls() {
+    balls = [];
+
+    // A compact hexagonal release formation centered on the heptagon.
+    // The small gaps prevent overlap while preserving the central drop.
+    const positions = [];
+    const radius = 2;
+
+    for (let q = -radius; q <= radius; q++) {
+      const rLow = Math.max(-radius, -q - radius);
+      const rHigh = Math.min(radius, -q + radius);
+
+      for (let r = rLow; r <= rHigh; r++) {
+        positions.push({
+          x: (q + r / 2) * (BALL_RADIUS * 2.08),
+          y: r * (BALL_RADIUS * 1.8)
+        });
+      }
+    }
+
+    positions.push({
+      x: 2 * (BALL_RADIUS * 2.08),
+      y: -2 * (BALL_RADIUS * 1.8)
+    });
+
+    positions.forEach((position, index) => {
+      balls.push({
+        x: CENTER_X + position.x,
+        y: CENTER_Y + position.y,
+        vx: (Math.random() - 0.5) * 32,
+        vy: 12 + Math.random() * 28,
+        radius: BALL_RADIUS,
+        mass: 1,
+        angle: Math.random() * Math.PI * 2,
+        spin: (Math.random() - 0.5) * 7,
+        color: COLORS[index],
+        number: index + 1
+      });
+    });
+  }
+
+  function limitBallMotion(ball) {
+    const speed = Math.hypot(ball.vx, ball.vy);
+
+    if (speed > MAX_TRAVEL_SPEED) {
+      const scale = MAX_TRAVEL_SPEED / speed;
+      ball.vx *= scale;
+      ball.vy *= scale;
+    }
+
+    // This also limits upward motion caused by ball-to-ball impacts.
+    if (ball.vy < 0 && -ball.vy > MAX_BOUNCE_SPEED) {
+      ball.vy = -MAX_BOUNCE_SPEED;
+    }
+
+    ball.spin = clamp(ball.spin, -35, 35);
+  }
+
+  function solveWallCollisions(ball) {
+    let receivedBounce = false;
+    let upwardFacingContact = false;
+
+    for (let i = 0; i < SIDES; i++) {
+      const p1 = polygon[i];
+      const p2 = polygon[(i + 1) % SIDES];
+
+      const edgeX = p2.x - p1.x;
+      const edgeY = p2.y - p1.y;
+      const edgeLength = Math.hypot(edgeX, edgeY);
+      const tangentX = edgeX / edgeLength;
+      const tangentY = edgeY / edgeLength;
+
+      // For counterclockwise vertices, this is the inward-facing normal.
+      const normalX = -tangentY;
+      const normalY = tangentX;
+
+      const distanceFromWall =
+        (ball.x - p1.x) * normalX +
+        (ball.y - p1.y) * normalY;
+
+      if (distanceFromWall >= ball.radius) continue;
+
+      const penetration = ball.radius - distanceFromWall;
+      ball.x += normalX * penetration;
+      ball.y += normalY * penetration;
+
+      // Choose the closest point on the actual moving edge.
+      const along =
+        (ball.x - p1.x) * tangentX +
+        (ball.y - p1.y) * tangentY;
+      const clampedAlong = clamp(along, 0, edgeLength);
+      const contactX = p1.x + tangentX * clampedAlong;
+      const contactY = p1.y + tangentY * clampedAlong;
+
+      // Velocity of this point on a rigid polygon rotating about its center.
+      const wallVX = -ANGULAR_VELOCITY * (contactY - CENTER_Y);
+      const wallVY = ANGULAR_VELOCITY * (contactX - CENTER_X);
+
+      const relativeNormalVelocity =
+        (ball.vx - wallVX) * normalX +
+        (ball.vy - wallVY) * normalY;
+
+      if (relativeNormalVelocity >= 0) continue;
+
+      const restitution = 0.58;
+      const normalImpulse = -(1 + restitution) * relativeNormalVelocity;
+
+      ball.vx += normalImpulse * normalX;
+      ball.vy += normalImpulse * normalY;
+
+      // Coulomb-style wall friction. Friction changes both linear
+      // velocity and angular velocity, so the balls visibly roll and spin.
+      const relativeTangentVelocity =
+        (ball.vx - wallVX) * tangentX +
+        (ball.vy - wallVY) * tangentY;
+
+      const surfaceSlip = relativeTangentVelocity - ball.spin * ball.radius;
+      const maximumFrictionImpulse = 0.18 * normalImpulse;
+      let frictionImpulse = -surfaceSlip / 3;
+
+      frictionImpulse = clamp(
+        frictionImpulse,
+        -maximumFrictionImpulse,
+        maximumFrictionImpulse
+      );
+
+      ball.vx += frictionImpulse * tangentX;
+      ball.vy += frictionImpulse * tangentY;
+      ball.spin += (-2 * frictionImpulse) / ball.radius;
+
+      receivedBounce = true;
+      if (normalY < -0.1) upwardFacingContact = true;
+    }
+
+    if (receivedBounce) {
+      limitBallMotion(ball);
+
+      // An upward-facing wall must produce a clearly visible rebound.
+      // Its apex is between MIN_BOUNCE_RISE and MAX_BOUNCE_RISE.
+      if (upwardFacingContact && -ball.vy < MIN_BOUNCE_SPEED) {
+        ball.vy = -MIN_BOUNCE_SPEED;
+      }
+    }
+  }
+
+  function solveBallCollisions() {
+    const diameter = BALL_RADIUS * 2;
+
+    for (let i = 0; i < balls.length; i++) {
+      const a = balls[i];
+
+      for (let j = i + 1; j < balls.length; j++) {
+        const b = balls[j];
+
+        let deltaX = b.x - a.x;
+        let deltaY = b.y - a.y;
+        let distance = Math.hypot(deltaX, deltaY);
+
+        if (distance >= diameter) continue;
+
+        if (distance < 0.0001) {
+          deltaX = 1;
+          deltaY = 0;
+          distance = 1;
+        }
+
+        const normalX = deltaX / distance;
+        const normalY = deltaY / distance;
+        const tangentX = -normalY;
+        const tangentY = normalX;
+        const overlap = diameter - distance;
+
+        a.x -= normalX * overlap * 0.5;
+        a.y -= normalY * overlap * 0.5;
+        b.x += normalX * overlap * 0.5;
+        b.y += normalY * overlap * 0.5;
+
+        const relativeX = b.vx - a.vx;
+        const relativeY = b.vy - a.vy;
+        const relativeNormalVelocity =
+          relativeX * normalX + relativeY * normalY;
+
+        if (relativeNormalVelocity >= 0) continue;
+
+        const restitution = 0.62;
+        const normalImpulse =
+          -(1 + restitution) * relativeNormalVelocity;
+
+        a.vx -= normalImpulse * normalX;
+        a.vy -= normalImpulse * normalY;
+        b.vx += normalImpulse * normalX;
+        b.vy += normalImpulse * normalY;
+
+        // Tangential impulse transfers some spin between colliding balls.
+        const relativeTangentVelocity =
+          relativeX * tangentX + relativeY * tangentY;
+        const surfaceSlip =
+          relativeTangentVelocity -
+          BALL_RADIUS * (a.spin + b.spin);
+
+        const maximumFrictionImpulse = 0.14 * normalImpulse;
+        let frictionImpulse = -surfaceSlip / 6;
+
+        frictionImpulse = clamp(
+          frictionImpulse,
+          -maximumFrictionImpulse,
+          maximumFrictionImpulse
+        );
+
+        a.vx -= frictionImpulse * tangentX;
+        a.vy -= frictionImpulse * tangentY;
+        b.vx += frictionImpulse * tangentX;
+        b.vy += frictionImpulse * tangentY;
+
+        a.spin += (-2 * frictionImpulse) / BALL_RADIUS;
+        b.spin += (-2 * frictionImpulse) / BALL_RADIUS;
+
+        limitBallMotion(a);
+        limitBallMotion(b);
+      }
+    }
+  }
+
+  function update(dt) {
+    simulationTime += dt;
+    polygonAngle = -Math.PI / 2 + simulationTime * ANGULAR_VELOCITY;
+    createPolygon();
+
+    const airDrag = Math.exp(-0.035 * dt);
+    const spinDrag = Math.exp(-0.055 * dt);
+
+    for (const ball of balls) {
+      ball.vy += GRAVITY * dt;
+      ball.vx *= airDrag;
+      ball.vy *= airDrag;
+      ball.spin *= spinDrag;
+
+      ball.x += ball.vx * dt;
+      ball.y += ball.vy * dt;
+      ball.angle += ball.spin * dt;
+
+      if (ball.angle > Math.PI * 2 || ball.angle < -Math.PI * 2) {
+        ball.angle %= Math.PI * 2;
+      }
+    }
+
+    for (const ball of balls) {
+      solveWallCollisions(ball);
+    }
+
+    solveBallCollisions();
+
+    // Resolve any overlap created by ball-to-ball position corrections.
+    for (const ball of balls) {
+      solveWallCollisions(ball);
+      limitBallMotion(ball);
+    }
+  }
+
+  function drawBackground() {
+    const gradient = ctx.createRadialGradient(
+      CENTER_X, CENTER_Y, 30,
+      CENTER_X, CENTER_Y, 430
+    );
+    gradient.addColorStop(0, "#111827");
+    gradient.addColorStop(0.55, "#0b101b");
+    gradient.addColorStop(1, "#05070c");
+
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, SIZE, SIZE);
+
+    ctx.save();
+    ctx.strokeStyle = "rgba(148, 163, 184, 0.045)";
+    ctx.lineWidth = 1;
+
+    for (let radius = 60; radius <= 340; radius += 40) {
+      ctx.beginPath();
+      ctx.arc(CENTER_X, CENTER_Y, radius, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+
+    for (let angle = 0; angle < Math.PI * 2; angle += Math.PI / 6) {
+      ctx.beginPath();
+      ctx.moveTo(CENTER_X, CENTER_Y);
+      ctx.lineTo(
+        CENTER_X + Math.cos(angle) * 350,
+        CENTER_Y + Math.sin(angle) * 350
+      );
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
+
+  function drawHeptagonInterior() {
+    ctx.save();
+
+    const path = new Path2D();
+    polygon.forEach((point, index) => {
+      if (index === 0) path.moveTo(point.x, point.y);
+      else path.lineTo(point.x, point.y);
+    });
+    path.closePath();
+
+    const fillGradient = ctx.createRadialGradient(
+      CENTER_X, CENTER_Y, 20,
+      CENTER_X, CENTER_Y, HEPTAGON_RADIUS
+    );
+    fillGradient.addColorStop(0, "rgba(56, 189, 248, 0.075)");
+    fillGradient.addColorStop(1, "rgba(15, 23, 42, 0.22)");
+
+    ctx.fillStyle = fillGradient;
+    ctx.fill(path);
+
+    ctx.strokeStyle = "rgba(125, 211, 252, 0.12)";
+    ctx.lineWidth = 1;
+    ctx.setLineDash([4, 9]);
+    ctx.stroke(path);
+    ctx.setLineDash([]);
+
+    ctx.strokeStyle = "rgba(125, 211, 252, 0.09)";
+    ctx.lineWidth = 1;
+    for (const point of polygon) {
+      ctx.beginPath();
+      ctx.moveTo(CENTER_X, CENTER_Y);
+      ctx.lineTo(point.x, point.y);
+      ctx.stroke();
+    }
+
+    const centerGlow = ctx.createRadialGradient(
+      CENTER_X, CENTER_Y, 0,
+      CENTER_X, CENTER_Y, 34
+    );
+    centerGlow.addColorStop(0, "rgba(125, 211, 252, 0.2)");
+    centerGlow.addColorStop(1, "rgba(125, 211, 252, 0)");
+    ctx.fillStyle = centerGlow;
+    ctx.beginPath();
+    ctx.arc(CENTER_X, CENTER_Y, 34, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.restore();
+  }
+
+  function drawBalls() {
+    const orderedBalls = [...balls].sort((a, b) => a.y - b.y);
+
+    for (const ball of orderedBalls) {
+      ctx.save();
+      ctx.translate(ball.x, ball.y);
+
+      ctx.shadowColor = "rgba(0, 0, 0, 0.7)";
+      ctx.shadowBlur = 10;
+      ctx.shadowOffsetY = 4;
+
+      ctx.beginPath();
+      ctx.arc(0, 0, ball.radius, 0, Math.PI * 2);
+      ctx.fillStyle = ball.color;
+      ctx.fill();
+
+      ctx.shadowColor = "transparent";
+      ctx.shadowBlur = 0;
+      ctx.shadowOffsetY = 0;
+
+      const gloss = ctx.createRadialGradient(
+        -5, -6, 1,
+        -3, -4, BALL_RADIUS * 1.2
+      );
+      gloss.addColorStop(0, "rgba(255, 255, 255, 0.48)");
+      gloss.addColorStop(0.32, "rgba(255, 255, 255, 0.12)");
+      gloss.addColorStop(1, "rgba(0, 0, 0, 0.08)");
+      ctx.fillStyle = gloss;
+      ctx.beginPath();
+      ctx.arc(0, 0, BALL_RADIUS - 0.5, 0, Math.PI * 2);
+      ctx.fill();
+
+      // The printed number rotates with the body, making spin visible.
+      ctx.rotate(ball.angle);
+      ctx.fillStyle = "rgba(48, 20, 7, 0.92)";
+      ctx.font = "700 12px Arial, sans-serif";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText(String(ball.number), 0, 0.5);
+
+      ctx.beginPath();
+      ctx.arc(7, -5, 1.6, 0, Math.PI * 2);
+      ctx.fillStyle = "rgba(255, 255, 255, 0.48)";
+      ctx.fill();
+
+      ctx.restore();
+    }
+  }
+
+  function drawHeptagonWalls() {
+    ctx.save();
+
+    const path = new Path2D();
+    polygon.forEach((point, index) => {
+      if (index === 0) path.moveTo(point.x, point.y);
+      else path.lineTo(point.x, point.y);
+    });
+    path.closePath();
+
+    ctx.shadowColor = "rgba(56, 189, 248, 0.55)";
+    ctx.shadowBlur = 15;
+    ctx.strokeStyle = "#67e8f9";
+    ctx.lineWidth = 6;
+    ctx.lineJoin = "round";
+    ctx.stroke(path);
+
+    ctx.shadowBlur = 0;
+    ctx.strokeStyle = "rgba(224, 242, 254, 0.8)";
+    ctx.lineWidth = 1.5;
+    ctx.stroke(path);
+
+    for (const point of polygon) {
+      ctx.beginPath();
+      ctx.arc(point.x, point.y, 4.5, 0, Math.PI * 2);
+      ctx.fillStyle = "#cffafe";
+      ctx.fill();
+    }
+
+    ctx.restore();
+  }
+
+  function drawHud() {
+    ctx.save();
+    ctx.fillStyle = "rgba(226, 232, 240, 0.8)";
+    ctx.font = "600 13px Arial, sans-serif";
+    ctx.textAlign = "left";
+    ctx.fillText("HEPTAGON DYNAMICS", 22, 30);
+
+    ctx.fillStyle = "rgba(148, 163, 184, 0.7)";
+    ctx.font = "12px Arial, sans-serif";
+    ctx.fillText("20 BALLS  •  72°/s  •  CUSTOM COLLISION PHYSICS", 22, 49);
+
+    ctx.textAlign = "right";
+    ctx.fillStyle = "rgba(125, 211, 252, 0.65)";
+    ctx.fillText(
+      `T ${simulationTime.toFixed(1)} s`,
+      SIZE - 22,
+      30
+    );
+
+    ctx.restore();
+  }
+
+  function draw() {
+    drawBackground();
+    drawHeptagonInterior();
+    drawBalls();
+    drawHeptagonWalls();
+    drawHud();
+  }
+
+  resetBalls();
+  createPolygon();
+
+  let previousTime = performance.now();
+  let accumulator = 0;
+
+  function frame(now) {
+    const frameDelta = Math.min((now - previousTime) / 1000, 0.05);
+    previousTime = now;
+    accumulator += frameDelta;
+
+    while (accumulator >= FIXED_STEP) {
+      update(FIXED_STEP);
+      accumulator -= FIXED_STEP;
+    }
+
+    draw();
+    requestAnimationFrame(frame);
+  }
+
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>

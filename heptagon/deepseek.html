@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Bouncing Balls in a Spinning Heptagon</title>
+<style>
+  html, body {
+    margin: 0; padding: 0; height: 100%;
+    background: #08080c;
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden;
+  }
+  canvas {
+    background: #0d0d12;
+    display: block;
+    box-shadow: 0 0 60px rgba(255, 170, 70, 0.08);
+    border-radius: 10px;
+  }
+</style>
+</head>
+<body>
+<canvas id="cv" width="720" height="720"></canvas>
+<script>
+(() => {
+"use strict";
+
+const cv  = document.getElementById('cv');
+const ctx = cv.getContext('2d');
+
+const W = 720, H = 720, CX = W / 2, CY = H / 2;
+
+const RAD    = 300;              // heptagon circumradius
+const SIDES  = 7;
+const BALL_R = 16;
+
+const GRAVITY     = 1000;        // px / s^2
+const E_WALL      = 0.66;        // wall restitution
+const E_BALL      = 0.90;        // ball-ball restitution
+const MU          = 0.35;        // friction coefficient
+const POLY_OMEGA  = 2 * Math.PI / 5.0;   // 360 deg / 5 s
+const MAX_SPEED   = 2400;
+
+/* ---------------------------------------------------------------- */
+/*  Heptagon geometry (recomputed every step because it spins)       */
+/* ---------------------------------------------------------------- */
+let rot = 0;
+let verts = [];
+
+function computeVerts() {
+  verts.length = 0;
+  for (let i = 0; i < SIDES; i++) {
+    const a = rot + i * 2 * Math.PI / SIDES - Math.PI / 2;
+    verts.push({
+      x: CX + RAD * Math.cos(a),
+      y: CY + RAD * Math.sin(a)
+    });
+  }
+}
+computeVerts();
+
+/* ---------------------------------------------------------------- */
+/*  Balls                                                            */
+/* ---------------------------------------------------------------- */
+const COLORS = [
+  "#f8b862", "#f6ad49", "#f39800", "#f08300", "#ec6d51",
+  "#ee7948", "#ed6d3d", "#ec6800", "#ee7800", "#eb6238",
+  "#ea5506", "#eb6101", "#e49e61", "#e45e32", "#e17b34",
+  "#dd7a56", "#db8449", "#d66a35", "#c85554", "#d9333f"
+];
+
+const balls = [];
+const COLS = 4, ROWS = 5;
+for (let i = 0; i < 20; i++) {
+  const c = i % COLS;
+  const r = Math.floor(i / COLS);
+  const sp = 2 * BALL_R + 1;
+  balls.push({
+    x: CX + (c - (COLS - 1) / 2) * sp,
+    y: CY + (r - (ROWS - 1) / 2) * sp,
+    vx: (Math.random() - 0.5) * 30,
+    vy: (Math.random() - 0.5) * 30,
+    ang: Math.random() * Math.PI * 2,   // visual rotation
+    spin: 0,                            // angular velocity (rad/s)
+    color: COLORS[i],
+    label: String(i + 1)
+  });
+}
+
+/* ---------------------------------------------------------------- */
+/*  Collision: ball vs rotating heptagon walls                       */
+/* ---------------------------------------------------------------- */
+function collideWalls() {
+  for (const b of balls) {
+    for (let i = 0; i < SIDES; i++) {
+      const A = verts[i];
+      const B = verts[(i + 1) % SIDES];
+
+      // edge direction
+      let ex = B.x - A.x, ey = B.y - A.y;
+      const len = Math.hypot(ex, ey);
+      ex /= len; ey /= len;
+
+      // inward normal
+      let nx = -ey, ny = ex;
+      if ((CX - A.x) * nx + (CY - A.y) * ny < 0) { nx = -nx; ny = -ny; }
+
+      // signed distance from ball centre to wall line
+      const d = (b.x - A.x) * nx + (b.y - A.y) * ny;
+
+      if (d < BALL_R) {
+        const pen = BALL_R - d;
+        // positional correction
+        b.x += nx * pen;
+        b.y += ny * pen;
+
+        // contact point (on the wall)
+        const cpx = b.x - nx * BALL_R;
+        const cpy = b.y - ny * BALL_R;
+
+        // velocity of the wall at the contact point  (v = w x r)
+        const wvx = -POLY_OMEGA * (cpy - CY);
+        const wvy =  POLY_OMEGA * (cpx - CX);
+
+        // velocity of the ball's surface at the contact point
+        const rvx = -nx * BALL_R, rvy = -ny * BALL_R;   // centre -> contact
+        const svx = b.vx - b.spin * rvy;
+        const svy = b.vy + b.spin * rvx;
+
+        // relative velocity
+        const vrx = svx - wvx;
+        const vry = svy - wvy;
+
+        const vn = vrx * nx + vry * ny;
+
+        if (vn < 0) {
+          // normal impulse (wall = infinite mass)
+          const jn = -(1 + E_WALL) * vn;
+          b.vx += jn * nx;
+          b.vy += jn * ny;
+
+          // tangential impulse -> friction + spin
+          const tx = -ny, ty = nx;
+          const vt = vrx * tx + vry * ty;
+
+          let jt = -vt / 3;                    // 1/m + r^2/I  with I = 0.5 m r^2
+          const lim = MU * Math.abs(jn);
+          if (jt >  lim) jt =  lim;
+          if (jt < -lim) jt = -lim;
+
+          b.vx += jt * tx;
+          b.vy += jt * ty;
+          b.spin += -2 * jt / BALL_R;
+        }
+      }
+    }
+  }
+}
+
+/* ---------------------------------------------------------------- */
+/*  Collision: ball vs ball                                          */
+/* ---------------------------------------------------------------- */
+function collideBalls() {
+  for (let i = 0; i < balls.length; i++) {
+    const a = balls[i];
+    for (let j = i + 1; j < balls.length; j++) {
+      const b = balls[j];
+
+      let dx = b.x - a.x;
+      let dy = b.y - a.y;
+      let dist = Math.hypot(dx, dy);
+
+      if (dist === 0) { dx = 0.001; dy = 0; dist = 0.001; }
+
+      const minD = 2 * BALL_R;
+      if (dist < minD) {
+        const nx = dx / dist, ny = dy / dist;
+        const pen = minD - dist;
+
+        // separate
+        a.x -= nx * pen * 0.5;  a.y -= ny * pen * 0.5;
+        b.x += nx * pen * 0.5;  b.y += ny * pen * 0.5;
+
+        // contact point velocities (including spin)
+        const rAx =  nx * BALL_R, rAy =  ny * BALL_R;
+        const rBx = -nx * BALL_R, rBy = -ny * BALL_R;
+
+        const avx = a.vx - a.spin * rAy;
+        const avy = a.vy + a.spin * rAx;
+        const bvx = b.vx - b.spin * rBy;
+        const bvy = b.vy + b.spin * rBx;
+
+        const vrx = avx - bvx;
+        const vry = avy - bvy;
+
+        const vn = vrx * nx + vry * ny;
+
+        if (vn < 0) {
+          // normal impulse, equal masses
+          const jn = -(1 + E_BALL) * vn / 2;
+          a.vx += jn * nx;  a.vy += jn * ny;
+          b.vx -= jn * nx;  b.vy -= jn * ny;
+
+          // tangential friction
+          const tx = -ny, ty = nx;
+          const vt = vrx * tx + vry * ty;
+
+          let jt = -vt / 6;
+          const lim = MU * Math.abs(jn);
+          if (jt >  lim) jt =  lim;
+          if (jt < -lim) jt = -lim;
+
+          a.vx += jt * tx;  a.vy += jt * ty;
+          b.vx -= jt * tx;  b.vy -= jt * ty;
+
+          a.spin += 2 * jt / BALL_R;
+          b.spin += 2 * jt / BALL_R;
+        }
+      }
+    }
+  }
+}
+
+/* ---------------------------------------------------------------- */
+/*  Physics step                                                     */
+/* ---------------------------------------------------------------- */
+function step(dt) {
+  rot += POLY_OMEGA * dt;
+  computeVerts();
+
+  const damp  = Math.exp(-0.20 * dt);   // air drag
+  const sdamp = Math.exp(-0.50 * dt);   // spin drag
+
+  for (const b of balls) {
+    b.vy += GRAVITY * dt;
+    b.vx *= damp;
+    b.vy *= damp;
+
+    b.x += b.vx * dt;
+    b.y += b.vy * dt;
+
+    b.ang += b.spin * dt;
+    b.spin *= sdamp;
+
+    // safety clamp
+    const sp = Math.hypot(b.vx, b.vy);
+    if (sp > MAX_SPEED) {
+      b.vx *= MAX_SPEED / sp;
+      b.vy *= MAX_SPEED / sp;
+    }
+  }
+
+  // a couple of relaxation iterations keeps stacked balls stable
+  for (let k = 0; k < 2; k++) {
+    collideWalls();
+    collideBalls();
+  }
+}
+
+/* ---------------------------------------------------------------- */
+/*  Rendering                                                        */
+/* ---------------------------------------------------------------- */
+function render() {
+  ctx.clearRect(0, 0, W, H);
+  ctx.fillStyle = '#0d0d12';
+  ctx.fillRect(0, 0, W, H);
+
+  // ---- heptagon ----
+  ctx.beginPath();
+  ctx.moveTo(verts[0].x, verts[0].y);
+  for (let i = 1; i < SIDES; i++) ctx.lineTo(verts[i].x, verts[i].y);
+  ctx.closePath();
+
+  ctx.fillStyle = 'rgba(255,190,120,0.035)';
+  ctx.fill();
+
+  ctx.lineJoin = 'round';
+  ctx.lineWidth = 8;
+  ctx.strokeStyle = 'rgba(255,180,90,0.10)';
+  ctx.stroke();
+
+  ctx.lineWidth = 3;
+  ctx.strokeStyle = '#7a6a58';
+  ctx.stroke();
+
+  // ---- balls ----
+  for (const b of balls) {
+    ctx.save();
+    ctx.translate(b.x, b.y);
+    ctx.rotate(b.ang);
+
+    // body
+    ctx.beginPath();
+    ctx.arc(0, 0, BALL_R, 0, Math.PI * 2);
+    ctx.fillStyle = b.color;
+    ctx.fill();
+
+    // rim
+    ctx.lineWidth = 1.5;
+    ctx.strokeStyle = 'rgba(0,0,0,0.35)';
+    ctx.stroke();
+
+    // spin marker
+    ctx.beginPath();
+    ctx.moveTo(0, 0);
+    ctx.lineTo(0, -BALL_R + 3);
+    ctx.strokeStyle = 'rgba(0,0,0,0.22)';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    // number
+    ctx.fillStyle = '#2a1d12';
+    ctx.font = (b.label.length > 1 ? 'bold 13px ' : 'bold 15px ') +
+               'system-ui, -apple-system, Segoe UI, Arial, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(b.label, 0, 0.5);
+
+    ctx.restore();
+  }
+}
+
+/* ---------------------------------------------------------------- */
+/*  Main loop (fixed timestep)                                       */
+/* ---------------------------------------------------------------- */
+const DT = 1 / 240;
+let acc = 0;
+let last = performance.now();
+
+function frame(now) {
+  let dt = (now - last) / 1000;
+  last = now;
+  if (dt > 0.1) dt = 0.1;
+
+  acc += dt;
+  let guard = 0;
+  while (acc >= DT && guard < 40) {
+    step(DT);
+    acc -= DT;
+    guard++;
+  }
+  if (guard >= 40) acc = 0;
+
+  render();
+  requestAnimationFrame(frame);
+}
+
+requestAnimationFrame(frame);
+
+})();
+</script>
+</body>
+</html>

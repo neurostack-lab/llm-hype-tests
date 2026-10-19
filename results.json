@@ -1,0 +1,194 @@
+{
+ "date": "2026-10-19",
+ "effort": "medium",
+ "runs": {
+  "heptagon/minimax": {
+   "seconds": 147.4,
+   "output_tokens": 17550,
+   "reasoning_tokens": 12964,
+   "bytes": 15328,
+   "usage": {
+    "prompt_tokens": 513,
+    "completion_tokens": 17550,
+    "total_tokens": 18063,
+    "cost": 0,
+    "is_byok": false,
+    "prompt_tokens_details": {
+     "cached_tokens": 195,
+     "cache_write_tokens": 0,
+     "audio_tokens": 0,
+     "video_tokens": 0
+    },
+    "cost_details": {
+     "upstream_inference_cost": 0,
+     "upstream_inference_prompt_cost": 0,
+     "upstream_inference_completions_cost": 0
+    },
+    "completion_tokens_details": {
+     "reasoning_tokens": 12964,
+     "image_tokens": 0,
+     "audio_tokens": 0
+    }
+   }
+  },
+  "heptagon/deepseek": {
+   "seconds": 44.9,
+   "output_tokens": 13783,
+   "reasoning_tokens": 10737,
+   "bytes": 9585,
+   "usage": {
+    "prompt_tokens": 344,
+    "completion_tokens": 13783,
+    "total_tokens": 14127,
+    "cost": 0.00691902,
+    "is_byok": false,
+    "prompt_tokens_details": {
+     "cached_tokens": 0,
+     "cache_write_tokens": 0,
+     "audio_tokens": 0,
+     "video_tokens": 0
+    },
+    "cost_details": {
+     "upstream_inference_cost": 0.00691902,
+     "upstream_inference_prompt_cost": 2.752e-05,
+     "upstream_inference_completions_cost": 0.0068915
+    },
+    "completion_tokens_details": {
+     "reasoning_tokens": 10737,
+     "image_tokens": 0,
+     "audio_tokens": 0
+    }
+   }
+  },
+  "heptagon/opus": {
+   "seconds": 88.8,
+   "output_tokens": 7161,
+   "reasoning_tokens": null,
+   "bytes": 8651,
+   "usage": {
+    "input_tokens": 4,
+    "cache_creation_input_tokens": 550,
+    "cache_read_input_tokens": 0,
+    "cache_creation": {
+     "ephemeral_5m_input_tokens": 0,
+     "ephemeral_1h_input_tokens": 550
+    },
+    "output_tokens": 7161,
+    "service_tier": "standard",
+    "inference_geo": "global",
+    "speed": "standard",
+    "output_tokens_details": {
+     "thinking_tokens": 2879
+    },
+    "iterations": [
+     {
+      "input_tokens": 4,
+      "output_tokens": 7161,
+      "cache_read_input_tokens": 0,
+      "cache_creation_input_tokens": 550,
+      "cache_creation": {
+       "ephemeral_5m_input_tokens": 0,
+       "ephemeral_1h_input_tokens": 550
+      },
+      "type": "message",
+      "model": null
+     }
+    ]
+   }
+  },
+  "pelican/minimax": {
+   "seconds": 32.5,
+   "output_tokens": 4565,
+   "reasoning_tokens": 1742,
+   "bytes": 7059,
+   "usage": {
+    "prompt_tokens": 225,
+    "completion_tokens": 4565,
+    "total_tokens": 4790,
+    "cost": 0,
+    "is_byok": false,
+    "prompt_tokens_details": {
+     "cached_tokens": 195,
+     "cache_write_tokens": 0,
+     "audio_tokens": 0,
+     "video_tokens": 0
+    },
+    "cost_details": {
+     "upstream_inference_cost": 0,
+     "upstream_inference_prompt_cost": 0,
+     "upstream_inference_completions_cost": 0
+    },
+    "completion_tokens_details": {
+     "reasoning_tokens": 1742,
+     "image_tokens": 0,
+     "audio_tokens": 0
+    }
+   }
+  },
+  "pelican/deepseek": {
+   "seconds": 21.3,
+   "output_tokens": 5754,
+   "reasoning_tokens": 3290,
+   "bytes": 6394,
+   "usage": {
+    "prompt_tokens": 53,
+    "completion_tokens": 5754,
+    "total_tokens": 5807,
+    "cost": 0.00288124,
+    "is_byok": false,
+    "prompt_tokens_details": {
+     "cached_tokens": 0,
+     "cache_write_tokens": 0,
+     "audio_tokens": 0,
+     "video_tokens": 0
+    },
+    "cost_details": {
+     "upstream_inference_cost": 0.00288124,
+     "upstream_inference_prompt_cost": 4.24e-06,
+     "upstream_inference_completions_cost": 0.002877
+    },
+    "completion_tokens_details": {
+     "reasoning_tokens": 3290,
+     "image_tokens": 0,
+     "audio_tokens": 0
+    }
+   }
+  },
+  "pelican/opus": {
+   "seconds": 21.4,
+   "output_tokens": 2180,
+   "reasoning_tokens": null,
+   "bytes": 3940,
+   "usage": {
+    "input_tokens": 171,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "cache_creation": {
+     "ephemeral_5m_input_tokens": 0,
+     "ephemeral_1h_input_tokens": 0
+    },
+    "output_tokens": 2180,
+    "service_tier": "standard",
+    "inference_geo": "global",
+    "speed": "standard",
+    "output_tokens_details": {
+     "thinking_tokens": 0
+    },
+    "iterations": [
+     {
+      "input_tokens": 171,
+      "output_tokens": 2180,
+      "cache_read_input_tokens": 0,
+      "cache_creation_input_tokens": 0,
+      "cache_creation": {
+       "ephemeral_5m_input_tokens": 0,
+       "ephemeral_1h_input_tokens": 0
+      },
+      "type": "message",
+      "model": null
+     }
+    ]
+   }
+  }
+ }
+}

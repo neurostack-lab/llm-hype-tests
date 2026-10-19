@@ -1,0 +1,35 @@
+{
+ "ttft": 2.6262051444500685,
+ "total": 88.78074785042554,
+ "usage": {
+  "input_tokens": 4,
+  "cache_creation_input_tokens": 550,
+  "cache_read_input_tokens": 0,
+  "cache_creation": {
+   "ephemeral_5m_input_tokens": 0,
+   "ephemeral_1h_input_tokens": 550
+  },
+  "output_tokens": 7161,
+  "service_tier": "standard",
+  "inference_geo": "global",
+  "speed": "standard",
+  "output_tokens_details": {
+   "thinking_tokens": 2879
+  },
+  "iterations": [
+   {
+    "input_tokens": 4,
+    "output_tokens": 7161,
+    "cache_read_input_tokens": 0,
+    "cache_creation_input_tokens": 550,
+    "cache_creation": {
+     "ephemeral_5m_input_tokens": 0,
+     "ephemeral_1h_input_tokens": 550
+    },
+    "type": "message",
+    "model": null
+   }
+  ]
+ },
+ "bytes": 8651
+}

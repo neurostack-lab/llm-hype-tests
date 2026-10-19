@@ -1,0 +1,30 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Хайп-тесты: MiniMax M3.1 Flash, DeepSeek V4.1 Flash, Opus 5.5</title>
+<style>
+:root{--bg:#f6f5f1;--fg:#16181d;--mut:#666;--card:#fff;--line:#e3e1da;--acc:#0f7a5c}
+@media (prefers-color-scheme:dark){:root{--bg:#121417;--fg:#eceae4;--mut:#9a9a94;--card:#1b1e23;--line:#2a2e35;--acc:#3fbf93}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.55 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+.w{max-width:1100px;margin:0 auto;padding:28px max(16px,env(safe-area-inset-left)) 40px max(16px,env(safe-area-inset-right))}
+h1{font-size:clamp(24px,4vw,34px);margin:0 0 8px}h2{margin:34px 0 12px}p{color:var(--mut);margin:0 0 12px}
+.g{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.c{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.c h3{margin:0;padding:12px 14px;font-size:16px}.c .b{aspect-ratio:1/1;background:#000;display:block;width:100%;border:0}
+.c img{display:block;width:100%;background:#fff}.c .m{padding:10px 14px;color:var(--mut);font-size:14px}a{color:var(--acc)}
+@media (max-width:760px){.g{grid-template-columns:1fr}}
+</style></head><body><div class="w">
+<h1>Хайп-тесты: MiniMax M3.1 Flash против DeepSeek V4.1 Flash и Opus 5.5</h1>
+<p>Одно задание — три модели, у всех уровень размышлений medium, один прогон. Код из ответов не правили. <a href="https://github.com/neurostack-lab/llm-hype-tests">Исходники и замеры</a></p>
+<h2>20 мячей в крутящемся семиугольнике</h2>
+<p>Физика с нуля в одном HTML. Страницы работают прямо здесь.</p>
+<div class="g">
+<div class="c"><h3>MiniMax M3.1 Flash</h3><iframe class="b" src="heptagon/minimax.html" loading="lazy" title="MiniMax"></iframe><div class="m">147 с · мячи прыгают бесконечно</div></div>
+<div class="c"><h3>DeepSeek V4.1 Flash</h3><iframe class="b" src="heptagon/deepseek.html" loading="lazy" title="DeepSeek"></iframe><div class="m">45 с · мячи ложатся</div></div>
+<div class="c"><h3>Claude Opus 5.5</h3><iframe class="b" src="heptagon/opus.html" loading="lazy" title="Opus"></iframe><div class="m">89 с · мячи ложатся</div></div>
+</div>
+<h2>Пеликан на велосипеде (SVG)</h2>
+<div class="g">
+<div class="c"><h3>MiniMax M3.1 Flash</h3><img src="pelican/minimax.svg" alt="Пеликан MiniMax"><div class="m">33 с</div></div>
+<div class="c"><h3>DeepSeek V4.1 Flash</h3><img src="pelican/deepseek.svg" alt="Пеликан DeepSeek"><div class="m">21 с</div></div>
+<div class="c"><h3>Claude Opus 5.5</h3><img src="pelican/opus.svg" alt="Пеликан Opus"><div class="m">21 с</div></div>
+</div>
+<p style="margin-top:28px">Канал с тестами моделей: <a href="https://t.me/neurostack_news">@neurostack_news</a></p>
+</div></body></html>
