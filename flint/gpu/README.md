@@ -30,7 +30,7 @@
 | RTX 5090 (32 ГБ) | AMD EPYC 9655 96-Core Processor | Q8 (Q8_0, 42,4 ГБ) | эксперты 12 слоёв из 49 на процессоре | — не влезает в видеопамять | — | — |
 | RTX 5090 (32 ГБ) | AMD EPYC 9655 96-Core Processor | Q8 (Q8_0, 42,4 ГБ) | эксперты 18 слоёв из 49 на процессоре | 138.8 | 908.0 | 27.5 |
 | RTX 5090 (32 ГБ) | AMD EPYC 9655 96-Core Processor | Q8 (Q8_0, 42,4 ГБ) | эксперты 24 слоёв из 49 на процессоре | 125.4 | 688.2 | 22.7 |
-| RTX 5090 (32 ГБ) | AMD EPYC 9655 96-Core Processor | Ollama `flint` (22 ГБ) | Ollama 0.40.9-rc1: 100% GPU | 223.86 | — | 22.5 |
+| RTX 5090 (32 ГБ) | AMD EPYC 9655 96-Core Processor | Ollama `flint` (22 ГБ) | Ollama 0.40.9-rc1: 100% GPU, контекст 32768 токенов | 223.86 | — | 22.5 |
 | RTX 4090 (24 ГБ) | AMD EPYC 9474F 48-Core Processor | Q3 (UD-Q3_K_XL, 18,5 ГБ) | целиком на видеокарте | 175.6 | 6573.8 | 18.3 |
 | RTX 4090 (24 ГБ) | AMD EPYC 9474F 48-Core Processor | Q4 (Q4_K_M, 24,2 ГБ) | эксперты 4 слоёв из 49 на процессоре | 168.9 | 2232.5 | 22.3 |
 | RTX 4090 (24 ГБ) | AMD EPYC 9474F 48-Core Processor | Q4 (Q4_K_M, 24,2 ГБ) | эксперты 6 слоёв из 49 на процессоре | 158.3 | 1337.6 | 21.4 |
@@ -41,7 +41,7 @@
 | RTX 4090 (24 ГБ) | AMD EPYC 9474F 48-Core Processor | Q4 (Q4_K_M, 24,2 ГБ) | эксперты 32 слоёв из 49 на процессоре | 89.9 | 270.9 | 9.9 |
 | RTX 4090 (24 ГБ) | AMD EPYC 9474F 48-Core Processor | Q4 (Q4_K_M, 24,2 ГБ) | все эксперты на процессоре | 68.2 | 180.1 | 2.0 |
 | RTX 4090 (24 ГБ) | AMD EPYC 9474F 48-Core Processor | Q4 (Q4_K_M, 24,2 ГБ) | только процессор | 37.8 | 166.1 | 1.1 |
-| RTX 4090 (24 ГБ) | AMD EPYC 9474F 48-Core Processor | Ollama `flint` (22 ГБ) | Ollama 0.40.9-rc1: 100% GPU | 174.3 | — | 22.3 |
+| RTX 4090 (24 ГБ) | AMD EPYC 9474F 48-Core Processor | Ollama `flint` (22 ГБ) | Ollama 0.40.9-rc1: 100% GPU, контекст 32768 токенов | 174.3 | — | 22.3 |
 | RTX A6000 (48 ГБ) | QEMU Virtual CPU version 2.5+ | Q4 (Q4_K_M, 24,2 ГБ) | целиком на видеокарте | 144.7 | 3322.0 | 23.6 |
 | RTX A6000 (48 ГБ) | QEMU Virtual CPU version 2.5+ | Q8 (Q8_0, 42,4 ГБ) | целиком на видеокарте | 118.2 | 3421.4 | 40.4 |
 | RTX 5080 (16 ГБ) | Intel(R) Core(TM) Ultra 7 270K Plus | IQ3 (UD-IQ3_XXS, 14,5 ГБ) | целиком на видеокарте | 179.6 | 4693.3 | 14.4 |
@@ -52,7 +52,7 @@
 | RTX 5080 (16 ГБ) | Intel(R) Core(TM) Ultra 7 270K Plus | Q4 (Q4_K_M, 24,2 ГБ) | эксперты 40 слоёв из 49 на процессоре | 72.7 | 501.2 | 6.2 |
 | RTX 5080 (16 ГБ) | Intel(R) Core(TM) Ultra 7 270K Plus | Q4 (Q4_K_M, 24,2 ГБ) | все эксперты на процессоре | 62.1 | 425.6 | 1.9 |
 | RTX 5080 (16 ГБ) | Intel(R) Core(TM) Ultra 7 270K Plus | Q4 (Q4_K_M, 24,2 ГБ) | только процессор | 27.4 | 388.9 | 1.0 |
-| RTX 5080 (16 ГБ) | Intel(R) Core(TM) Ultra 7 270K Plus | Ollama `flint` (15 ГБ) | Ollama 0.40.9-rc1: 0%/100% CPU/GPU | 89.76 | — | 14.4 |
+| RTX 5080 (16 ГБ) | Intel(R) Core(TM) Ultra 7 270K Plus | Ollama `flint` (15 ГБ) | Ollama 0.40.9-rc1: 0%/100% CPU/GPU, контекст 4096 токенов | 89.76 | — | 14.4 |
 | RTX 4070 Ti SUPER (16 ГБ) | AMD Ryzen 9 9900X 12-Core Processor | IQ3 (UD-IQ3_XXS, 14,5 ГБ) | целиком на видеокарте | 152.1 | 4263.0 | 14.3 |
 | RTX 4070 Ti SUPER (16 ГБ) | AMD Ryzen 9 9900X 12-Core Processor | Q4 (Q4_K_M, 24,2 ГБ) | эксперты 18 слоёв из 49 на процессоре | — не влезает в видеопамять | — | — |
 | RTX 4070 Ti SUPER (16 ГБ) | AMD Ryzen 9 9900X 12-Core Processor | Q4 (Q4_K_M, 24,2 ГБ) | эксперты 22 слоёв из 49 на процессоре | 95.0 | 803.0 | 14.1 |
@@ -61,7 +61,7 @@
 | RTX 4070 Ti SUPER (16 ГБ) | AMD Ryzen 9 9900X 12-Core Processor | Q4 (Q4_K_M, 24,2 ГБ) | эксперты 40 слоёв из 49 на процессоре | 66.1 | 480.0 | 6.1 |
 | RTX 4070 Ti SUPER (16 ГБ) | AMD Ryzen 9 9900X 12-Core Processor | Q4 (Q4_K_M, 24,2 ГБ) | все эксперты на процессоре | 57.0 | 405.1 | 1.8 |
 | RTX 4070 Ti SUPER (16 ГБ) | AMD Ryzen 9 9900X 12-Core Processor | Q4 (Q4_K_M, 24,2 ГБ) | только процессор | 24.7 | 367.7 | 0.9 |
-| RTX 4070 Ti SUPER (16 ГБ) | AMD Ryzen 9 9900X 12-Core Processor | Ollama `flint` (15 ГБ) | Ollama 0.40.9-rc1: 0%/100% CPU/GPU | 96.59 | — | 14.6 |
+| RTX 4070 Ti SUPER (16 ГБ) | AMD Ryzen 9 9900X 12-Core Processor | Ollama `flint` (15 ГБ) | Ollama 0.40.9-rc1: 0%/100% CPU/GPU, контекст 4096 токенов | 96.59 | — | 14.6 |
 | RTX 5070 Ti (16 ГБ) | AMD Ryzen 7 9800X3D 8-Core Processor | IQ3 (UD-IQ3_XXS, 14,5 ГБ) | целиком на видеокарте | 171.1 | 3920.5 | 14.3 |
 | RTX 5070 Ti (16 ГБ) | AMD Ryzen 7 9800X3D 8-Core Processor | Q4 (Q4_K_M, 24,2 ГБ) | эксперты 18 слоёв из 49 на процессоре | — не влезает в видеопамять | — | — |
 | RTX 5070 Ti (16 ГБ) | AMD Ryzen 7 9800X3D 8-Core Processor | Q4 (Q4_K_M, 24,2 ГБ) | эксперты 22 слоёв из 49 на процессоре | 105.6 | 954.7 | 14.1 |
@@ -70,7 +70,7 @@
 | RTX 5070 Ti (16 ГБ) | AMD Ryzen 7 9800X3D 8-Core Processor | Q4 (Q4_K_M, 24,2 ГБ) | эксперты 40 слоёв из 49 на процессоре | 73.9 | 575.7 | 6.2 |
 | RTX 5070 Ti (16 ГБ) | AMD Ryzen 7 9800X3D 8-Core Processor | Q4 (Q4_K_M, 24,2 ГБ) | все эксперты на процессоре | 63.5 | 485.9 | 1.9 |
 | RTX 5070 Ti (16 ГБ) | AMD Ryzen 7 9800X3D 8-Core Processor | Q4 (Q4_K_M, 24,2 ГБ) | только процессор | 27.6 | 445.9 | 0.9 |
-| RTX 5070 Ti (16 ГБ) | AMD Ryzen 7 9800X3D 8-Core Processor | Ollama `flint` (16 ГБ) | Ollama 0.40.9-rc1: 7%/93% CPU/GPU | 107.45 | — | 14.5 |
+| RTX 5070 Ti (16 ГБ) | AMD Ryzen 7 9800X3D 8-Core Processor | Ollama `flint` (16 ГБ) | Ollama 0.40.9-rc1: 7%/93% CPU/GPU, контекст 4096 токенов | 107.45 | — | 14.5 |
 
 Сырые данные: [gpu_results.json](../gpu_results.json). Замер — `llama-bench -fa 1 -r 2`, видеопамять — максимум по `nvidia-smi` за прогон.
 
