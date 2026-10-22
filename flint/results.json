@@ -1,0 +1,620 @@
+{
+ "date": "2026-10-22",
+ "runs": 2,
+ "models": {
+  "flint": {
+   "label": "Flint",
+   "model": "recursive/flint-v1.0:free",
+   "via": "OpenRouter (бесплатно)",
+   "code": 20,
+   "code_total": 20,
+   "fix": 6,
+   "fix_total": 6,
+   "instr": 8,
+   "instr_total": 8,
+   "empty": 0,
+   "cut": 0,
+   "errors": 0,
+   "details": {
+    "code_anagrams": [
+     true,
+     true
+    ],
+    "code_bizday": [
+     true,
+     true
+    ],
+    "code_csvline": [
+     true,
+     true
+    ],
+    "code_duration": [
+     true,
+     true
+    ],
+    "code_flatten": [
+     true,
+     true
+    ],
+    "code_intervals": [
+     true,
+     true
+    ],
+    "code_ipv4": [
+     true,
+     true
+    ],
+    "code_lru": [
+     true,
+     true
+    ],
+    "code_roman": [
+     true,
+     true
+    ],
+    "code_topwords": [
+     true,
+     true
+    ],
+    "fix_bsearch": [
+     true,
+     true
+    ],
+    "fix_movavg": [
+     true,
+     true
+    ],
+    "fix_mutdefault": [
+     true,
+     true
+    ],
+    "instr_commit": [
+     true,
+     true
+    ],
+    "instr_json": [
+     true,
+     true
+    ],
+    "instr_lines": [
+     true,
+     true
+    ],
+    "instr_number": [
+     true,
+     true
+    ]
+   },
+   "speed_tok_s": 155.3,
+   "ttft_s": 0.5,
+   "task_time_s": 4.1,
+   "task_time_max_s": 96.1,
+   "task_tokens": 531,
+   "calls": 36
+  },
+  "gptoss": {
+   "label": "GPT-OSS 20B",
+   "model": "gpt-oss:20b",
+   "via": "Ollama Cloud",
+   "code": 18,
+   "code_total": 20,
+   "fix": 6,
+   "fix_total": 6,
+   "instr": 8,
+   "instr_total": 8,
+   "empty": 0,
+   "cut": 0,
+   "errors": 0,
+   "details": {
+    "code_anagrams": [
+     true,
+     true
+    ],
+    "code_bizday": [
+     true,
+     true
+    ],
+    "code_csvline": [
+     true,
+     true
+    ],
+    "code_duration": [
+     true,
+     true
+    ],
+    "code_flatten": [
+     false,
+     true
+    ],
+    "code_intervals": [
+     true,
+     true
+    ],
+    "code_ipv4": [
+     true,
+     true
+    ],
+    "code_lru": [
+     true,
+     true
+    ],
+    "code_roman": [
+     true,
+     false
+    ],
+    "code_topwords": [
+     true,
+     true
+    ],
+    "fix_bsearch": [
+     true,
+     true
+    ],
+    "fix_movavg": [
+     true,
+     true
+    ],
+    "fix_mutdefault": [
+     true,
+     true
+    ],
+    "instr_commit": [
+     true,
+     true
+    ],
+    "instr_json": [
+     true,
+     true
+    ],
+    "instr_lines": [
+     true,
+     true
+    ],
+    "instr_number": [
+     true,
+     true
+    ]
+   },
+   "fails": {
+    "code_flatten#0": " File \"/tmp/flintgrade/cases/gptoss__code_flatten__0/test_run.py\", line 10, in <module>     assert flatten({}) == {}            ^^^^^^^^^^^^^^^^^ AssertionError",
+    "code_roman#1": "grade/cases/gptoss__code_roman__1/test_run.py\", line 14, in <module>     raise AssertionError(\"no ValueError for %r\" % bad) AssertionError: no ValueError for ''"
+   },
+   "speed_tok_s": 132.5,
+   "ttft_s": 0.45,
+   "task_time_s": 5.1,
+   "task_time_max_s": 28.4,
+   "task_tokens": 548,
+   "calls": 36
+  },
+  "laguna": {
+   "label": "Laguna XS 2.1",
+   "model": "poolside/laguna-xs-2.1:free",
+   "via": "OpenRouter (бесплатно)",
+   "code": 20,
+   "code_total": 20,
+   "fix": 6,
+   "fix_total": 6,
+   "instr": 5,
+   "instr_total": 8,
+   "empty": 1,
+   "cut": 1,
+   "errors": 0,
+   "details": {
+    "code_anagrams": [
+     true,
+     true
+    ],
+    "code_bizday": [
+     true,
+     true
+    ],
+    "code_csvline": [
+     true,
+     true
+    ],
+    "code_duration": [
+     true,
+     true
+    ],
+    "code_flatten": [
+     true,
+     true
+    ],
+    "code_intervals": [
+     true,
+     true
+    ],
+    "code_ipv4": [
+     true,
+     true
+    ],
+    "code_lru": [
+     true,
+     true
+    ],
+    "code_roman": [
+     true,
+     true
+    ],
+    "code_topwords": [
+     true,
+     true
+    ],
+    "fix_bsearch": [
+     true,
+     true
+    ],
+    "fix_movavg": [
+     true,
+     true
+    ],
+    "fix_mutdefault": [
+     true,
+     true
+    ],
+    "instr_commit": [
+     true,
+     false
+    ],
+    "instr_json": [
+     true,
+     true
+    ],
+    "instr_lines": [
+     true,
+     true
+    ],
+    "instr_number": [
+     false,
+     false
+    ]
+   },
+   "speed_tok_s": 82.2,
+   "ttft_s": 0.29,
+   "task_time_s": 48.0,
+   "task_time_max_s": 150.3,
+   "task_tokens": 3706,
+   "calls": 36
+  },
+  "deepseek": {
+   "label": "DeepSeek V4.1 Flash",
+   "model": "deepseek-v4.1-flash",
+   "via": "Ollama Cloud",
+   "code": 19,
+   "code_total": 20,
+   "fix": 6,
+   "fix_total": 6,
+   "instr": 8,
+   "instr_total": 8,
+   "empty": 1,
+   "cut": 1,
+   "errors": 0,
+   "details": {
+    "code_anagrams": [
+     true,
+     true
+    ],
+    "code_bizday": [
+     true,
+     true
+    ],
+    "code_csvline": [
+     true,
+     true
+    ],
+    "code_duration": [
+     true,
+     true
+    ],
+    "code_flatten": [
+     true,
+     true
+    ],
+    "code_intervals": [
+     true,
+     true
+    ],
+    "code_ipv4": [
+     true,
+     true
+    ],
+    "code_lru": [
+     true,
+     true
+    ],
+    "code_roman": [
+     true,
+     false
+    ],
+    "code_topwords": [
+     true,
+     true
+    ],
+    "fix_bsearch": [
+     true,
+     true
+    ],
+    "fix_movavg": [
+     true,
+     true
+    ],
+    "fix_mutdefault": [
+     true,
+     true
+    ],
+    "instr_commit": [
+     true,
+     true
+    ],
+    "instr_json": [
+     true,
+     true
+    ],
+    "instr_lines": [
+     true,
+     true
+    ],
+    "instr_number": [
+     true,
+     true
+    ]
+   },
+   "fails": {
+    "code_roman#1": ">     assert to_roman(1994) == \"MCMXCIV\" and to_roman(3999) == \"MMMCMXCIX\" and to_roman(4) == \"IV\"            ^^^^^^^^ NameError: name 'to_roman' is not defined"
+   },
+   "speed_tok_s": 276.7,
+   "ttft_s": 0.46,
+   "task_time_s": 2.4,
+   "task_time_max_s": 16.0,
+   "task_tokens": 582,
+   "calls": 36
+  },
+  "local_4070tis_iq3": {
+   "label": "local_4070tis_iq3",
+   "model": "local_4070tis_iq3",
+   "via": "своя карта, llama.cpp",
+   "code": 10,
+   "code_total": 10,
+   "fix": 3,
+   "fix_total": 3,
+   "instr": 0,
+   "instr_total": 0,
+   "empty": 0,
+   "cut": 0,
+   "errors": 0,
+   "details": {
+    "code_anagrams": [
+     true
+    ],
+    "code_bizday": [
+     true
+    ],
+    "code_csvline": [
+     true
+    ],
+    "code_duration": [
+     true
+    ],
+    "code_flatten": [
+     true
+    ],
+    "code_intervals": [
+     true
+    ],
+    "code_ipv4": [
+     true
+    ],
+    "code_lru": [
+     true
+    ],
+    "code_roman": [
+     true
+    ],
+    "code_topwords": [
+     true
+    ],
+    "fix_bsearch": [
+     true
+    ],
+    "fix_movavg": [
+     true
+    ],
+    "fix_mutdefault": [
+     true
+    ]
+   },
+   "speed_tok_s": 143.0,
+   "ttft_s": 0.58,
+   "task_time_s": 7.5,
+   "task_time_max_s": 62.7,
+   "task_tokens": 999,
+   "calls": 13
+  },
+  "local_4090_q3": {
+   "label": "local_4090_q3",
+   "model": "local_4090_q3",
+   "via": "своя карта, llama.cpp",
+   "code": 10,
+   "code_total": 10,
+   "fix": 3,
+   "fix_total": 3,
+   "instr": 0,
+   "instr_total": 0,
+   "empty": 0,
+   "cut": 0,
+   "errors": 0,
+   "details": {
+    "code_anagrams": [
+     true
+    ],
+    "code_bizday": [
+     true
+    ],
+    "code_csvline": [
+     true
+    ],
+    "code_duration": [
+     true
+    ],
+    "code_flatten": [
+     true
+    ],
+    "code_intervals": [
+     true
+    ],
+    "code_ipv4": [
+     true
+    ],
+    "code_lru": [
+     true
+    ],
+    "code_roman": [
+     true
+    ],
+    "code_topwords": [
+     true
+    ],
+    "fix_bsearch": [
+     true
+    ],
+    "fix_movavg": [
+     true
+    ],
+    "fix_mutdefault": [
+     true
+    ]
+   },
+   "speed_tok_s": 163.0,
+   "ttft_s": 0.63,
+   "task_time_s": 4.5,
+   "task_time_max_s": 48.2,
+   "task_tokens": 630,
+   "calls": 13
+  },
+  "local_5090_q4": {
+   "label": "local_5090_q4",
+   "model": "local_5090_q4",
+   "via": "своя карта, llama.cpp",
+   "code": 9,
+   "code_total": 10,
+   "fix": 3,
+   "fix_total": 3,
+   "instr": 0,
+   "instr_total": 0,
+   "empty": 1,
+   "cut": 1,
+   "errors": 0,
+   "details": {
+    "code_anagrams": [
+     true
+    ],
+    "code_bizday": [
+     true
+    ],
+    "code_csvline": [
+     true
+    ],
+    "code_duration": [
+     true
+    ],
+    "code_flatten": [
+     true
+    ],
+    "code_intervals": [
+     true
+    ],
+    "code_ipv4": [
+     false
+    ],
+    "code_lru": [
+     true
+    ],
+    "code_roman": [
+     true
+    ],
+    "code_topwords": [
+     true
+    ],
+    "fix_bsearch": [
+     true
+    ],
+    "fix_movavg": [
+     true
+    ],
+    "fix_mutdefault": [
+     true
+    ]
+   },
+   "fails": {
+    "code_ipv4#0": "_code_ipv4__0/test_run.py\", line 6, in <module>     assert is_valid_ipv4(ok) is True, ok            ^^^^^^^^^^^^^ NameError: name 'is_valid_ipv4' is not defined"
+   },
+   "speed_tok_s": 210.7,
+   "ttft_s": 0.62,
+   "task_time_s": 8.1,
+   "task_time_max_s": 79.1,
+   "task_tokens": 1593,
+   "calls": 13
+  },
+  "local_a6000_q8": {
+   "label": "local_a6000_q8",
+   "model": "local_a6000_q8",
+   "via": "своя карта, llama.cpp",
+   "code": 10,
+   "code_total": 10,
+   "fix": 3,
+   "fix_total": 3,
+   "instr": 0,
+   "instr_total": 0,
+   "empty": 0,
+   "cut": 0,
+   "errors": 0,
+   "details": {
+    "code_anagrams": [
+     true
+    ],
+    "code_bizday": [
+     true
+    ],
+    "code_csvline": [
+     true
+    ],
+    "code_duration": [
+     true
+    ],
+    "code_flatten": [
+     true
+    ],
+    "code_intervals": [
+     true
+    ],
+    "code_ipv4": [
+     true
+    ],
+    "code_lru": [
+     true
+    ],
+    "code_roman": [
+     true
+    ],
+    "code_topwords": [
+     true
+    ],
+    "fix_bsearch": [
+     true
+    ],
+    "fix_movavg": [
+     true
+    ],
+    "fix_mutdefault": [
+     true
+    ]
+   },
+   "speed_tok_s": 110.8,
+   "ttft_s": 0.41,
+   "task_time_s": 6.4,
+   "task_time_max_s": 67.1,
+   "task_tokens": 662,
+   "calls": 13
+  }
+ }
+}

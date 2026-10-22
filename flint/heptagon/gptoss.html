@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Bouncing Balls Inside a Rotating Heptagon</title>
+<style>
+  body{margin:0;background:#111;}
+  canvas{display:block;margin:auto;background:#111;}
+</style>
+</head>
+<body>
+<canvas id="c" width="720" height="720"></canvas>
+<script>
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+const W = 720, H = 720;
+const cx = W/2, cy = H/2;
+
+// Ball colors
+const colors = ['#f8b862','#f6ad49','#f39800','#f08300','#ec6d51',
+                '#ee7948','#ed6d3d','#ec6800','#ee7800','#eb6238',
+                '#ea5506','#eb6101','#e49e61','#e45e32','#e17b34',
+                '#dd7a56','#db8449','#d66a35','#c85554','#d9333f'];
+
+const N = 20;
+const r = 12;                     // ball radius
+const g = 800;                    // gravity (px/s²)
+const dt = 1/60;                  // time step
+const angSpeed = 2*Math.PI/5;     // 360° every 5 s
+const R = 260;                    // heptagon radius
+
+let heptAngle = 0;
+
+// ---------- Physics utilities ----------
+function add(a,b){return {x:a.x+b.x,y:a.y+b.y};}
+function sub(a,b){return {x:a.x-b.x,y:a.y-b.y};}
+function mul(v,s){return {x:v.x*s,y:v.y*s};}
+function dot(a,b){return a.x*b.x+a.y*b.y;}
+function mag(v){return Math.hypot(v.x,v.y);}
+
+// ---------- Ball class ----------
+class Ball{
+  constructor(id){
+    this.id = id+1;
+    this.x = cx;
+    this.y = cy;
+    this.vx = 0;
+    this.vy = 0;
+    this.ax = 0;
+    this.ay = g;
+    this.radius = r;
+    this.color = colors[id];
+    this.angle = 0;                 // visual rotation
+    this.omega = 0;                 // angular velocity
+  }
+  step(){
+    this.vx += this.ax*dt;
+    this.vy += this.ay*dt;
+    this.x  += this.vx*dt;
+    this.y  += this.vy*dt;
+    this.angle += this.omega*dt;
+  }
+}
+
+// ---------- Scene ----------
+const balls = [];
+for(let i=0;i<N;i++) balls.push(new Ball(i));
+
+// ---------- Heptagon vertices ----------
+function heptagonVerts(e){
+  const v=[];
+  for(let k=0;k<7;k++){
+    const th = e + 2*Math.PI*k/7;
+    v.push({x:cx + R*Math.cos(th), y:cy + R*Math.sin(th)});
+  }
+  return v;
+}
+
+// ---------- Collision with walls ----------
+function wallCollisions(){
+  const verts = heptagonVerts(heptAngle);
+  for(const b of balls){
+    for(let i=0;i<7;i++){
+      const a = verts[i], b0 = verts[(i+1)%7];
+      const seg = sub(b0,a);
+      const segMag2 = dot(seg,seg);
+      if(segMag2===0) continue;
+      const t = Math.max(0,Math.min(1, dot(sub({x:b.x,y:b.y},a),seg)/segMag2));
+      const nearest = add(a, mul(seg,t));
+      const diff = sub({x:b.x,y:b.y},nearest);
+      const dist = mag(diff);
+      if(dist < b.radius){
+        const normal = mul(diff,1/dist); // point inside
+        const push = b.radius - dist;
+        b.x += normal.x*push;
+        b.y += normal.y*push;
+
+        // Reflect velocity
+        const vn = dot({x:b.vx,y:b.vy},normal);
+        b.vx -= 2*vn*normal.x;
+        b.vy -= 2*vn*normal.y;
+
+        // Temporary friction → spin
+        const tang = {x:-normal.y,y:normal.x};
+        const vt = dot({x:b.vx,y:b.vy},tang);
+        const fric = 0.02;
+        b.omega += vt*fric/b.radius;
+
+        // Clamp vertical component to respect bounce limits
+        if(b.vy < 0){                         // upward
+          const minU=Math.sqrt(2*g*r);
+          const maxU=Math.sqrt(2*g*R);
+          let u = -b.vy;
+          u = Math.max(minU,Math.min(u,maxU));
+          b.vy = -u;
+        }
+      }
+    }
+  }
+}
+
+// ---------- Ball‑ball collisions ----------
+function ballCollisions(){
+  const L = balls.length;
+  for(let i=0;i<L;i++){
+    for(let j=i+1;j<L;j++){
+      const a = balls[i], b = balls[j];
+      const d = sub({x:b.x,y:b.y},{x:a.x,y:a.y});
+      const dist = mag(d);
+      if(dist < 2*a.radius){
+        const overlap = 0.5*(2*a.radius - dist);
+        const normal = mul(d,1/dist);
+        // Separate
+        a.x -= normal.x*overlap;
+        a.y -= normal.y*overlap;
+        b.x += normal.x*overlap;
+        b.y += normal.y*overlap;
+        // Elastic exchange
+        const relV = sub({x:b.vx,y:b.vy},{x:a.vx,y:a.vy});
+        const vn = dot(relV,normal);
+        if(vn > 0) continue;  // moving apart
+        const impulse = mul(normal,vn);
+        a.vx += impulse.x;
+        a.vy += impulse.y;
+        b.vx -= impulse.x;
+        b.vy -= impulse.y;
+        // Friction → spin
+        const tang = {x:-normal.y,y:normal.x};
+        const vtA = dot({x:a.vx,y:a.vy},tang);
+        const vtB = dot({x:b.vx,y:b.vy},tang);
+        const fric = 0.02;
+        a.omega += vtA*fric/a.radius;
+        b.omega += vtB*fric/b.radius;
+      }
+    }
+  }
+}
+
+// ---------- Rendering ----------
+function draw(){
+  ctx.fillStyle='#111';
+  ctx.fillRect(0,0,W,H);
+
+  // Heptagon
+  const verts = heptagonVerts(heptAngle);
+  ctx.strokeStyle='#444';
+  ctx.lineWidth=2;
+  ctx.beginPath();
+  ctx.moveTo(verts[0].x,verts[0].y);
+  for(let i=1;i<verts.length;i++){
+    ctx.lineTo(verts[i].x,verts[i].y);
+  }
+  ctx.closePath();
+  ctx.stroke();
+
+  // Balls
+  for(const b of balls){
+    ctx.save();
+    ctx.translate(b.x,b.y);
+    ctx.rotate(b.angle);
+    ctx.beginPath();
+    ctx.arc(0,0,b.radius,0,2*Math.PI);
+    ctx.fillStyle=b.color;
+    ctx.fill();
+    ctx.strokeStyle='rgba(255,255,255,0.2)';
+    ctx.lineWidth=1;
+    ctx.stroke();
+    ctx.fillStyle='#000';
+    ctx.textAlign='center';
+    ctx.textBaseline='middle';
+    ctx.font='bold 12px Arial';
+    ctx.fillText(b.id.toString(),0,0);
+    ctx.restore();
+  }
+}
+
+// ---------- Main loop ----------
+function loop(){
+  heptAngle += angSpeed*dt;
+  for(const b of balls) b.step();
+  wallCollisions();
+  ballCollisions();
+  draw();
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>

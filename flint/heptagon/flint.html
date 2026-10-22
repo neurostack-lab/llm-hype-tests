@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Bouncing Heptagon</title>
+</head>
+<body>
+<canvas id="canvas" width="720" height="720"></canvas>
+<script>
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+const W = 720, H = 720;
+const cx = 360, cy = 360;
+const R = 260;
+const ballRadius = 8;
+const gravity = 1500;
+const restitution = 0.6;
+const spinSpeed = (Math.PI * 2) / 5;
+let rotation = 0;
+let lastTime = 0;
+let balls = [];
+
+const colors = ["#f8b862", "#f6ad49", "#f39800", "#f08300", "#ec6d51", "#ee7948", "#ed6d3d", "#ec6800", "#ee7800", "#eb6238", "#ea5506", "#eb6101", "#e49e61", "#e45e32", "#e17b34", "#dd7a56", "#db8449", "#d66a35", "#c85554", "#d9333f"];
+
+for (let i = 0; i < 20; i++) {
+  balls.push({
+    x: cx, y: cy, vx: 0, vy: 0,
+    radius: ballRadius, color: colors[i], number: i + 1,
+    angle: 0, angularVel: 0
+  });
+}
+
+function getVertices() {
+  let verts = [];
+  for (let i = 0; i < 7; i++) {
+    let angle = -Math.PI / 2 + i * (2 * Math.PI / 7) + rotation;
+    verts.push({
+      x: cx + R * Math.cos(angle),
+      y: cy + R * Math.sin(angle)
+    });
+  }
+  return verts;
+}
+
+function dot(v1, v2) {
+  return v1.x * v2.x + v1.y * v2.y;
+}
+
+function sub(v1, v2) {
+  return { x: v1.x - v2.x, y: v1.y - v2.y };
+}
+
+function update(dt) {
+  rotation += spinSpeed * dt;
+
+  for (let ball of balls) {
+    ball.vy += gravity * dt;
+
+    // Friction
+    ball.vx *= (1 - 0.5 * dt);
+    ball.vy *= (1 - 0.5 * dt);
+
+    // Spin due to rolling friction
+    let targetAngVel = ball.vx / ball.radius;
+    ball.angularVel += (targetAngVel - ball.angularVel) * 0.1 * dt;
+    ball.angle += ball.angularVel * dt;
+
+    ball.x += ball.vx * dt;
+    ball.y += ball.vy * dt;
+
+    // Wall collision
+    let verts = getVertices();
+    for (let i = 0; i < verts.length; i++) {
+      let p1 = verts[i];
+      let p2 = verts[(i + 1) % verts.length];
+      let e = { x: p2.x - p1.x, y: p2.y - p1.y };
+      let eLen = Math.sqrt(e.x * e.x + e.y * e.y);
+      let n = { x: e.y / eLen, y: -e.x / eLen };
+      let c = { x: cx - p1.x, y: cy - p1.y };
+      if (c.x * n.x + c.y * n.y > 0) {
+        n = { x: -n.x, y: -n.y };
+      }
+      let d = (ball.x - p1.x) * n.x + (ball.y - p1.y) * n.y;
+      if (d > -ball.radius) {
+        let vn = ball.vx * n.x + ball.vy * n.y;
+        let vnAfter = -restitution * vn;
+        ball.vx += (vnAfter - vn) * n.x;
+        ball.vy += (vnAfter - vn) * n.y;
+        let penetration = ball.radius + d;
+        ball.x -= n.x * penetration;
+        ball.y -= n.y * penetration;
+        break;
+      }
+    }
+  }
+
+  // Ball-ball collisions
+  for (let i = 0; i < balls.length; i++) {
+    for (let j = i + 1; j < balls.length; j++) {
+      let a = balls[i];
+      let b = balls[j];
+      let dx = b.x - a.x;
+      let dy = b.y - a.y;
+      let dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist < 2 * ballRadius) {
+        let nx = dx / dist;
+        let ny = dy / dist;
+        let overlap = 2 * ballRadius - dist;
+        a.x -= nx * overlap / 2;
+        a.y -= ny * overlap / 2;
+        b.x += nx * overlap / 2;
+        b.y += ny * overlap / 2;
+
+        let dvx = a.vx - b.vx;
+        let dvy = a.vy - b.vy;
+        let velAlongNormal = dvx * nx + dvy * ny;
+        if (velAlongNormal > 0) continue;
+
+        let e = 0.9;
+        let impulse = (1 + e) * velAlongNormal / (1 + 1);
+        a.vx -= impulse * nx;
+        a.vy -= impulse * ny;
+        b.vx += impulse * nx;
+        b.vy += impulse * ny;
+      }
+    }
+  }
+}
+
+function draw() {
+  ctx.fillStyle = '#0a0a0f';
+  ctx.fillRect(0, 0, W, H);
+
+  let verts = getVertices();
+  ctx.beginPath();
+  ctx.moveTo(verts[0].x, verts[0].y);
+  for (let i = 1; i < verts.length; i++) {
+    ctx.lineTo(verts[i].x, verts[i].y);
+  }
+  ctx.closePath();
+  ctx.fillStyle = 'rgba(255,255,255,0.05)';
+  ctx.fill();
+  ctx.strokeStyle = '#444';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
+  for (let ball of balls) {
+    ctx.save();
+    ctx.translate(ball.x, ball.y);
+    ctx.rotate(ball.angle);
+    ctx.beginPath();
+    ctx.arc(0, 0, ball.radius, 0, Math.PI * 2);
+    ctx.fillStyle = ball.color;
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(0,0,0,0.4)';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    ctx.fillStyle = 'white';
+    ctx.font = 'bold 14px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(ball.number, 0, 0);
+    ctx.restore();
+  }
+}
+
+function gameLoop(timestamp) {
+  let dt = (timestamp - lastTime) / 1000;
+  if (dt > 0.05) dt = 0.05;
+  lastTime = timestamp;
+
+  update(dt);
+  draw();
+
+  requestAnimationFrame(gameLoop);
+}
+
+requestAnimationFrame(gameLoop);
+</script>
+</body>
+</html>

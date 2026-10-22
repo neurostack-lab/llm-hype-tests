@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="200" viewBox="0 0 400 200">
+  <!-- Bicycle -->
+  <g id="bike" stroke="black" stroke-width="3" fill="none">
+    <!-- Frame -->
+    <path d="M80,170 L280,170 M80,170 L200,80 M200,80 L280,170" />
+    <!-- Wheels -->
+    <circle cx="80" cy="170" r="30" fill="#ddd" stroke="black" stroke-width="2"/>
+    <circle cx="280" cy="170" r="30" fill="#ddd" stroke="black" stroke-width="2"/>
+    <!-- Seat -->
+    <line x1="280" y1="170" x2="260" y2="150" stroke-width="5"/>
+    <!-- Handlebar -->
+    <path d="M80,170 L80,110 Q70,100 90,110" />
+    <!-- Pedal -->
+    <circle cx="200" cy="80" r="5" fill="#555"/>
+  </g>
+
+  <!-- Pelican -->
+  <g id="pelican" transform="translate(260,120)" fill="#a8d5a4" stroke="#5b8e5d" stroke-width="2">
+    <!-- Body -->
+    <ellipse cx="0" cy="0" rx="30" ry="50"/>
+    <!-- Head -->
+    <circle cx="0" cy="-20" r="15"/>
+    <!-- Beak -->
+    <polygon points="-10,-20 10,-25 10,-15" fill="#ffc978" stroke="none"/>
+    <!-- Wings -->
+    <path d="M-40,20 Q0,-20 40,20" stroke="#7cae7c" stroke-width="3" fill="none"/>
+    <!-- Tail -->
+    <polygon points="0,50 -15,70 15,70" fill="#7cae7c" stroke="none"/>
+    <!-- Legs -->
+    <line x1="-10" y1="45" x2="-10" y2="55" stroke="#6c953d" stroke-width="2"/>
+    <line x1="10" y1="45" x2="10" y2="55" stroke="#6c953d" stroke-width="2"/>
+  </g>
+</svg>

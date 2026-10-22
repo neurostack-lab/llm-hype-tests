@@ -1,0 +1,625 @@
+{
+ "5090": {
+  "label": "RTX 5090",
+  "vram": 32,
+  "cpu": "AMD EPYC 9655 96-Core Processor",
+  "configs": [
+   {
+    "tag": "q4_full",
+    "quant": "q4",
+    "quant_label": "Q4 (Q4_K_M, 24,2 ГБ)",
+    "vram_gb": 23.9,
+    "ok": true,
+    "mode": "целиком на видеокарте",
+    "pp512": 7582.0,
+    "pp4096": 7880.5,
+    "tg128": 236.9,
+    "pp512@16k": 6502.5,
+    "pp4096@16k": 6883.0,
+    "tg128@16k": 214.8
+   },
+   {
+    "tag": "q4_long",
+    "quant": "q4",
+    "quant_label": "Q4 (Q4_K_M, 24,2 ГБ)",
+    "vram_gb": 27.0,
+    "ok": true,
+    "mode": "целиком, длинный контекст",
+    "pp2048@32k": 6137.1,
+    "tg128@32k": 198.3,
+    "pp2048@64k": 4625.6,
+    "tg128@64k": 178.8,
+    "pp2048@128k": 2469.0,
+    "tg128@128k": 146.9
+   },
+   {
+    "tag": "q6_ncmoe0",
+    "quant": "q6",
+    "quant_label": "Q6 (Q6_K, 32,7 ГБ)",
+    "vram_gb": 31.4,
+    "ok": true,
+    "mode": "целиком на видеокарте",
+    "ncmoe": 0,
+    "pp512": 6609.6,
+    "pp4096": 6820.4,
+    "tg128": 226.7
+   },
+   {
+    "tag": "q6_ncmoe2",
+    "quant": "q6",
+    "quant_label": "Q6 (Q6_K, 32,7 ГБ)",
+    "vram_gb": 31.4,
+    "ok": true,
+    "mode": "эксперты 2 слоёв из 49 на процессоре",
+    "ncmoe": 2,
+    "pp512": 6611.5,
+    "pp4096": 6815.1,
+    "tg128": 226.7
+   },
+   {
+    "tag": "q6_ncmoe4",
+    "quant": "q6",
+    "quant_label": "Q6 (Q6_K, 32,7 ГБ)",
+    "vram_gb": 30.1,
+    "ok": true,
+    "mode": "эксперты 4 слоёв из 49 на процессоре",
+    "ncmoe": 4,
+    "pp512": 4020.4,
+    "pp4096": 4112.2,
+    "tg128": 204.4
+   },
+   {
+    "tag": "q6_ncmoe8",
+    "quant": "q6",
+    "quant_label": "Q6 (Q6_K, 32,7 ГБ)",
+    "vram_gb": 27.7,
+    "ok": true,
+    "mode": "эксперты 8 слоёв из 49 на процессоре",
+    "ncmoe": 8,
+    "pp512": 2266.3,
+    "pp4096": 2296.9,
+    "tg128": 180.8
+   },
+   {
+    "tag": "q8_ncmoe12",
+    "quant": "q8",
+    "quant_label": "Q8 (Q8_0, 42,4 ГБ)",
+    "vram_gb": 0.5,
+    "ok": false,
+    "mode": "эксперты 12 слоёв из 49 на процессоре",
+    "ncmoe": 12,
+    "error": "не влезает в видеопамять"
+   },
+   {
+    "tag": "q8_ncmoe18",
+    "quant": "q8",
+    "quant_label": "Q8 (Q8_0, 42,4 ГБ)",
+    "vram_gb": 27.5,
+    "ok": true,
+    "mode": "эксперты 18 слоёв из 49 на процессоре",
+    "ncmoe": 18,
+    "pp512": 898.2,
+    "pp4096": 908.0,
+    "tg128": 138.8
+   },
+   {
+    "tag": "q8_ncmoe24",
+    "quant": "q8",
+    "quant_label": "Q8 (Q8_0, 42,4 ГБ)",
+    "vram_gb": 22.7,
+    "ok": true,
+    "mode": "эксперты 24 слоёв из 49 на процессоре",
+    "ncmoe": 24,
+    "pp512": 684.6,
+    "pp4096": 688.2,
+    "tg128": 125.4
+   }
+  ],
+  "ollama": {
+   "version": "0.40.9-rc1",
+   "tg": 223.86,
+   "size": "22 GB",
+   "processor": "100% GPU",
+   "context": 32768,
+   "vram_gb": 22.5
+  }
+ },
+ "4090": {
+  "label": "RTX 4090",
+  "vram": 24,
+  "cpu": "AMD EPYC 9474F 48-Core Processor",
+  "configs": [
+   {
+    "tag": "q3_full",
+    "quant": "q3",
+    "quant_label": "Q3 (UD-Q3_K_XL, 18,5 ГБ)",
+    "vram_gb": 18.3,
+    "ok": true,
+    "mode": "целиком на видеокарте",
+    "pp512": 6388.8,
+    "pp4096": 6573.8,
+    "tg128": 175.6,
+    "pp512@16k": 5629.7,
+    "pp4096@16k": 5664.5,
+    "tg128@16k": 157.1
+   },
+   {
+    "tag": "q4_ncmoe4",
+    "quant": "q4",
+    "quant_label": "Q4 (Q4_K_M, 24,2 ГБ)",
+    "vram_gb": 22.3,
+    "ok": true,
+    "mode": "эксперты 4 слоёв из 49 на процессоре",
+    "ncmoe": 4,
+    "pp512": 2208.2,
+    "pp4096": 2232.5,
+    "tg128": 168.9
+   },
+   {
+    "tag": "q4_ncmoe6",
+    "quant": "q4",
+    "quant_label": "Q4 (Q4_K_M, 24,2 ГБ)",
+    "vram_gb": 21.4,
+    "ok": true,
+    "mode": "эксперты 6 слоёв из 49 на процессоре",
+    "ncmoe": 6,
+    "pp512": 1327.3,
+    "pp4096": 1337.6,
+    "tg128": 158.3
+   },
+   {
+    "tag": "q4_ncmoe8",
+    "quant": "q4",
+    "quant_label": "Q4 (Q4_K_M, 24,2 ГБ)",
+    "vram_gb": 20.5,
+    "ok": true,
+    "mode": "эксперты 8 слоёв из 49 на процессоре",
+    "ncmoe": 8,
+    "pp512": 982.6,
+    "pp4096": 993.9,
+    "tg128": 151.8
+   },
+   {
+    "tag": "q4_ncmoe12",
+    "quant": "q4",
+    "quant_label": "Q4 (Q4_K_M, 24,2 ГБ)",
+    "vram_gb": 18.7,
+    "ok": true,
+    "mode": "эксперты 12 слоёв из 49 на процессоре",
+    "ncmoe": 12,
+    "pp512": 637.6,
+    "pp4096": 639.4,
+    "tg128": 139.8
+   },
+   {
+    "tag": "q4_ncmoe16",
+    "quant": "q4",
+    "quant_label": "Q4 (Q4_K_M, 24,2 ГБ)",
+    "vram_gb": 17.0,
+    "ok": true,
+    "mode": "эксперты 16 слоёв из 49 на процессоре",
+    "ncmoe": 16,
+    "pp512": 495.5,
+    "pp4096": 498.1,
+    "tg128": 122.0
+   },
+   {
+    "tag": "q4_ncmoe24",
+    "quant": "q4",
+    "quant_label": "Q4 (Q4_K_M, 24,2 ГБ)",
+    "vram_gb": 13.4,
+    "ok": true,
+    "mode": "эксперты 24 слоёв из 49 на процессоре",
+    "ncmoe": 24,
+    "pp512": 353.3,
+    "pp4096": 354.0,
+    "tg128": 101.8
+   },
+   {
+    "tag": "q4_ncmoe32",
+    "quant": "q4",
+    "quant_label": "Q4 (Q4_K_M, 24,2 ГБ)",
+    "vram_gb": 9.9,
+    "ok": true,
+    "mode": "эксперты 32 слоёв из 49 на процессоре",
+    "ncmoe": 32,
+    "pp512": 272.0,
+    "pp4096": 270.9,
+    "tg128": 89.9
+   },
+   {
+    "tag": "q4_ncmoe49",
+    "quant": "q4",
+    "quant_label": "Q4 (Q4_K_M, 24,2 ГБ)",
+    "vram_gb": 2.0,
+    "ok": true,
+    "mode": "все эксперты на процессоре",
+    "ncmoe": 49,
+    "pp512": 178.8,
+    "pp4096": 180.1,
+    "tg128": 68.2
+   },
+   {
+    "tag": "q4_cpu",
+    "quant": "q4",
+    "quant_label": "Q4 (Q4_K_M, 24,2 ГБ)",
+    "vram_gb": 1.1,
+    "ok": true,
+    "mode": "только процессор",
+    "pp512": 166.1,
+    "tg64": 37.8
+   }
+  ],
+  "ollama": {
+   "version": "0.40.9-rc1",
+   "tg": 174.3,
+   "size": "22 GB",
+   "processor": "100% GPU",
+   "context": 32768,
+   "vram_gb": 22.3
+  }
+ },
+ "a6000": {
+  "label": "RTX A6000",
+  "vram": 48,
+  "cpu": "QEMU Virtual CPU version 2.5+",
+  "configs": [
+   {
+    "tag": "q4_full",
+    "quant": "q4",
+    "quant_label": "Q4 (Q4_K_M, 24,2 ГБ)",
+    "vram_gb": 23.6,
+    "ok": true,
+    "mode": "целиком на видеокарте",
+    "pp512": 3091.3,
+    "pp4096": 3322.0,
+    "tg128": 144.7,
+    "pp512@16k": 2662.3,
+    "pp4096@16k": 2846.5,
+    "tg128@16k": 130.2
+   },
+   {
+    "tag": "q8_full",
+    "quant": "q8",
+    "quant_label": "Q8 (Q8_0, 42,4 ГБ)",
+    "vram_gb": 40.4,
+    "ok": true,
+    "mode": "целиком на видеокарте",
+    "pp512": 2613.7,
+    "pp4096": 3421.4,
+    "tg128": 118.2,
+    "pp512@16k": 2619.6,
+    "pp4096@16k": 2908.8,
+    "tg128@16k": 108.4
+   }
+  ],
+  "ollama": null
+ },
+ "5080": {
+  "label": "RTX 5080",
+  "vram": 16,
+  "cpu": "Intel(R) Core(TM) Ultra 7 270K Plus",
+  "configs": [
+   {
+    "tag": "iq3_full",
+    "quant": "iq3",
+    "quant_label": "IQ3 (UD-IQ3_XXS, 14,5 ГБ)",
+    "vram_gb": 14.4,
+    "ok": true,
+    "mode": "целиком на видеокарте",
+    "pp512": 4576.1,
+    "pp4096": 4693.3,
+    "tg128": 179.6,
+    "pp512@8k": 4253.0,
+    "pp4096@8k": 4380.3,
+    "tg128@8k": 166.5
+   },
+   {
+    "tag": "q4_ncmoe18",
+    "quant": "q4",
+    "quant_label": "Q4 (Q4_K_M, 24,2 ГБ)",
+    "vram_gb": 15.3,
+    "ok": false,
+    "mode": "эксперты 18 слоёв из 49 на процессоре",
+    "ncmoe": 18,
+    "error": "не влезает в видеопамять"
+   },
+   {
+    "tag": "q4_ncmoe22",
+    "quant": "q4",
+    "quant_label": "Q4 (Q4_K_M, 24,2 ГБ)",
+    "vram_gb": 14.2,
+    "ok": true,
+    "mode": "эксперты 22 слоёв из 49 на процессоре",
+    "ncmoe": 22,
+    "pp512": 853.0,
+    "pp4096": 851.0,
+    "tg128": 103.2
+   },
+   {
+    "tag": "q4_ncmoe26",
+    "quant": "q4",
+    "quant_label": "Q4 (Q4_K_M, 24,2 ГБ)",
+    "vram_gb": 12.4,
+    "ok": true,
+    "mode": "эксперты 26 слоёв из 49 на процессоре",
+    "ncmoe": 26,
+    "pp512": 748.5,
+    "pp4096": 747.5,
+    "tg128": 95.3
+   },
+   {
+    "tag": "q4_ncmoe32",
+    "quant": "q4",
+    "quant_label": "Q4 (Q4_K_M, 24,2 ГБ)",
+    "vram_gb": 9.8,
+    "ok": true,
+    "mode": "эксперты 32 слоёв из 49 на процессоре",
+    "ncmoe": 32,
+    "pp512": 624.2,
+    "pp4096": 623.8,
+    "tg128": 84.1
+   },
+   {
+    "tag": "q4_ncmoe40",
+    "quant": "q4",
+    "quant_label": "Q4 (Q4_K_M, 24,2 ГБ)",
+    "vram_gb": 6.2,
+    "ok": true,
+    "mode": "эксперты 40 слоёв из 49 на процессоре",
+    "ncmoe": 40,
+    "pp512": 500.0,
+    "pp4096": 501.2,
+    "tg128": 72.7
+   },
+   {
+    "tag": "q4_ncmoe49",
+    "quant": "q4",
+    "quant_label": "Q4 (Q4_K_M, 24,2 ГБ)",
+    "vram_gb": 1.9,
+    "ok": true,
+    "mode": "все эксперты на процессоре",
+    "ncmoe": 49,
+    "pp512": 421.0,
+    "pp4096": 425.6,
+    "tg128": 62.1
+   },
+   {
+    "tag": "q4_cpu",
+    "quant": "q4",
+    "quant_label": "Q4 (Q4_K_M, 24,2 ГБ)",
+    "vram_gb": 1.0,
+    "ok": true,
+    "mode": "только процессор",
+    "pp512": 388.9,
+    "tg64": 27.4
+   }
+  ],
+  "ollama": {
+   "version": "0.40.9-rc1",
+   "tg": 89.76,
+   "size": "15 GB",
+   "processor": "0%/100% CPU/GPU",
+   "context": 4096,
+   "vram_gb": 14.4
+  }
+ },
+ "4070tis": {
+  "label": "RTX 4070 Ti SUPER",
+  "vram": 16,
+  "cpu": "AMD Ryzen 9 9900X 12-Core Processor",
+  "configs": [
+   {
+    "tag": "iq3_full",
+    "quant": "iq3",
+    "quant_label": "IQ3 (UD-IQ3_XXS, 14,5 ГБ)",
+    "vram_gb": 14.3,
+    "ok": true,
+    "mode": "целиком на видеокарте",
+    "pp512": 4230.2,
+    "pp4096": 4263.0,
+    "tg128": 152.1,
+    "pp512@8k": 3845.9,
+    "pp4096@8k": 3931.7,
+    "tg128@8k": 139.9
+   },
+   {
+    "tag": "q4_ncmoe18",
+    "quant": "q4",
+    "quant_label": "Q4 (Q4_K_M, 24,2 ГБ)",
+    "vram_gb": 15.3,
+    "ok": false,
+    "mode": "эксперты 18 слоёв из 49 на процессоре",
+    "ncmoe": 18,
+    "error": "не влезает в видеопамять"
+   },
+   {
+    "tag": "q4_ncmoe22",
+    "quant": "q4",
+    "quant_label": "Q4 (Q4_K_M, 24,2 ГБ)",
+    "vram_gb": 14.1,
+    "ok": true,
+    "mode": "эксперты 22 слоёв из 49 на процессоре",
+    "ncmoe": 22,
+    "pp512": 804.2,
+    "pp4096": 803.0,
+    "tg128": 95.0
+   },
+   {
+    "tag": "q4_ncmoe26",
+    "quant": "q4",
+    "quant_label": "Q4 (Q4_K_M, 24,2 ГБ)",
+    "vram_gb": 12.4,
+    "ok": true,
+    "mode": "эксперты 26 слоёв из 49 на процессоре",
+    "ncmoe": 26,
+    "pp512": 707.0,
+    "pp4096": 708.8,
+    "tg128": 88.8
+   },
+   {
+    "tag": "q4_ncmoe32",
+    "quant": "q4",
+    "quant_label": "Q4 (Q4_K_M, 24,2 ГБ)",
+    "vram_gb": 9.7,
+    "ok": true,
+    "mode": "эксперты 32 слоёв из 49 на процессоре",
+    "ncmoe": 32,
+    "pp512": 588.1,
+    "pp4096": 588.1,
+    "tg128": 78.3
+   },
+   {
+    "tag": "q4_ncmoe40",
+    "quant": "q4",
+    "quant_label": "Q4 (Q4_K_M, 24,2 ГБ)",
+    "vram_gb": 6.1,
+    "ok": true,
+    "mode": "эксперты 40 слоёв из 49 на процессоре",
+    "ncmoe": 40,
+    "pp512": 479.0,
+    "pp4096": 480.0,
+    "tg128": 66.1
+   },
+   {
+    "tag": "q4_ncmoe49",
+    "quant": "q4",
+    "quant_label": "Q4 (Q4_K_M, 24,2 ГБ)",
+    "vram_gb": 1.8,
+    "ok": true,
+    "mode": "все эксперты на процессоре",
+    "ncmoe": 49,
+    "pp512": 400.8,
+    "pp4096": 405.1,
+    "tg128": 57.0
+   },
+   {
+    "tag": "q4_cpu",
+    "quant": "q4",
+    "quant_label": "Q4 (Q4_K_M, 24,2 ГБ)",
+    "vram_gb": 0.9,
+    "ok": true,
+    "mode": "только процессор",
+    "pp512": 367.7,
+    "tg64": 24.7
+   }
+  ],
+  "ollama": {
+   "version": "0.40.9-rc1",
+   "tg": 96.59,
+   "size": "15 GB",
+   "processor": "0%/100% CPU/GPU",
+   "context": 4096,
+   "vram_gb": 14.6
+  }
+ },
+ "5070ti": {
+  "label": "RTX 5070 Ti",
+  "vram": 16,
+  "cpu": "AMD Ryzen 7 9800X3D 8-Core Processor",
+  "configs": [
+   {
+    "tag": "iq3_full",
+    "quant": "iq3",
+    "quant_label": "IQ3 (UD-IQ3_XXS, 14,5 ГБ)",
+    "vram_gb": 14.3,
+    "ok": true,
+    "mode": "целиком на видеокарте",
+    "pp512": 3951.5,
+    "pp4096": 3920.5,
+    "tg128": 171.1,
+    "pp512@8k": 3589.8,
+    "pp4096@8k": 3638.8,
+    "tg128@8k": 159.1
+   },
+   {
+    "tag": "q4_ncmoe18",
+    "quant": "q4",
+    "quant_label": "Q4 (Q4_K_M, 24,2 ГБ)",
+    "vram_gb": 15.3,
+    "ok": false,
+    "mode": "эксперты 18 слоёв из 49 на процессоре",
+    "ncmoe": 18,
+    "error": "не влезает в видеопамять"
+   },
+   {
+    "tag": "q4_ncmoe22",
+    "quant": "q4",
+    "quant_label": "Q4 (Q4_K_M, 24,2 ГБ)",
+    "vram_gb": 14.1,
+    "ok": true,
+    "mode": "эксперты 22 слоёв из 49 на процессоре",
+    "ncmoe": 22,
+    "pp512": 951.9,
+    "pp4096": 954.7,
+    "tg128": 105.6
+   },
+   {
+    "tag": "q4_ncmoe26",
+    "quant": "q4",
+    "quant_label": "Q4 (Q4_K_M, 24,2 ГБ)",
+    "vram_gb": 12.4,
+    "ok": true,
+    "mode": "эксперты 26 слоёв из 49 на процессоре",
+    "ncmoe": 26,
+    "pp512": 843.1,
+    "pp4096": 840.8,
+    "tg128": 96.3
+   },
+   {
+    "tag": "q4_ncmoe32",
+    "quant": "q4",
+    "quant_label": "Q4 (Q4_K_M, 24,2 ГБ)",
+    "vram_gb": 9.7,
+    "ok": true,
+    "mode": "эксперты 32 слоёв из 49 на процессоре",
+    "ncmoe": 32,
+    "pp512": 706.5,
+    "pp4096": 705.9,
+    "tg128": 84.8
+   },
+   {
+    "tag": "q4_ncmoe40",
+    "quant": "q4",
+    "quant_label": "Q4 (Q4_K_M, 24,2 ГБ)",
+    "vram_gb": 6.2,
+    "ok": true,
+    "mode": "эксперты 40 слоёв из 49 на процессоре",
+    "ncmoe": 40,
+    "pp512": 575.5,
+    "pp4096": 575.7,
+    "tg128": 73.9
+   },
+   {
+    "tag": "q4_ncmoe49",
+    "quant": "q4",
+    "quant_label": "Q4 (Q4_K_M, 24,2 ГБ)",
+    "vram_gb": 1.9,
+    "ok": true,
+    "mode": "все эксперты на процессоре",
+    "ncmoe": 49,
+    "pp512": 481.7,
+    "pp4096": 485.9,
+    "tg128": 63.5
+   },
+   {
+    "tag": "q4_cpu",
+    "quant": "q4",
+    "quant_label": "Q4 (Q4_K_M, 24,2 ГБ)",
+    "vram_gb": 0.9,
+    "ok": true,
+    "mode": "только процессор",
+    "pp512": 445.9,
+    "tg64": 27.6
+   }
+  ],
+  "ollama": {
+   "version": "0.40.9-rc1",
+   "tg": 107.45,
+   "size": "16 GB",
+   "processor": "7%/93% CPU/GPU",
+   "context": 4096,
+   "vram_gb": 14.5
+  }
+ }
+}

@@ -1,0 +1,147 @@
+Here's a complete HTML document that simulates 20 numbered balls bouncing inside a spinning heptagon with gravity, friction, and realistic collisions.
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>20 Balls in a Spinning Heptagon</title>
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    background: #06060a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+  canvas {
+    display: block;
+    background: #06060a;
+  }
+</style>
+</head>
+<body>
+<canvas id="cv" width="720" height="720"></canvas>
+<script>
+(function () {
+  "use strict";
+
+  /* ------------------------------------------------------------------ */
+  /*  Setup                                                              */
+  /* ------------------------------------------------------------------ */
+  const canvas = document.getElementById("cv");
+  const ctx    = canvas.getContext("2d");
+
+  const W = 720, H = 720;
+  const CX = W / 2, CY = H / 2;
+
+  const SIDES = 7;
+  const R      = 330;                       // circumradius of the heptagon
+  const OMEGA  = (2 * Math.PI) / 5;         // 360 degrees per 5 seconds
+
+  const N       = 20;
+  const BALL_R  = 15;
+  const GRAV    = 1000;                     // px / s^2
+  const E_WALL  = 0.70;                     // restitution against the walls
+  const E_BALL  = 0.80;                     // restitution ball vs ball
+  const MU_WALL = 0.35;                     // friction against the walls
+  const MU_BALL = 0.25;                     // friction ball vs ball
+  const AIR     = 0.15;                     // linear air drag (1/s)
+  const SPIN_DAMP = 0.45;                   // angular damping (1/s)
+
+  const MAX_SPEED = 2600;                   // safety clamp
+  const MAX_SPIN  = 90;
+
+  const TAU = Math.PI * 2;
+
+  const COLORS = [
+    "#f8b862", "#f6ad49", "#f39800", "#f08300", "#ec6d51",
+    "#ee7948", "#ed6d3d", "#ec6800", "#ee7800", "#eb6238",
+    "#ea5506", "#eb6101", "#e49e61", "#e45e32", "#e17b34",
+    "#dd7a56", "#db8449", "#d66a35", "#c85554", "#d9333f"
+  ];
+
+  /* ------------------------------------------------------------------ */
+  /*  State                                                              */
+  /* ------------------------------------------------------------------ */
+  let polyAngle = 0;
+  let verts = [];
+
+  function computeVerts() {
+    verts.length = 0;
+    for (let i = 0; i < SIDES; i++) {
+      const th = polyAngle + i * TAU / SIDES - Math.PI / 2;
+      verts.push({ x: CX + R * Math.cos(th), y: CY + R * Math.sin(th) });
+    }
+  }
+  computeVerts();
+
+  const balls = [];
+
+  function initBalls() {
+    for (let i = 0; i < N; i++) {
+      // All balls start at the heptagon center (tiny spread so the
+      // solver does not have to untangle 20 perfectly coincident discs).
+      const a   = Math.random() * TAU;
+      const rad = Math.random() * 26;
+      balls.push({
+        x: CX + Math.cos(a) * rad,
+        y: CY + Math.sin(a) * rad,
+        vx: 0,
+        vy: 0,
+        ang: Math.random() * TAU,   // visual rotation angle
+        va: 0,                      // angular velocity (rad/s)
+        r: BALL_R,
+        m: 1,
+        I: 0.5 * BALL_R * BALL_R,
+        color: COLORS[i],
+        num: i + 1
+      });
+    }
+  }
+  initBalls();
+
+  /* ------------------------------------------------------------------ */
+  /*  Ball vs ball                                                       */
+  /* ------------------------------------------------------------------ */
+  function collideBalls(a, b) {
+    let dx = b.x - a.x;
+    let dy = b.y - a.y;
+    const minD = a.r + b.r;
+    let d2 = dx * dx + dy * dy;
+    if (d2 >= minD * minD) return;
+
+    let dist = Math.sqrt(d2);
+    if (dist < 1e-6) { dx = 1; dy = 0; dist = 1e-6; }
+
+    const nx = dx / dist;
+    const ny = dy / dist;
+
+    // --- positional correction (split evenly) -------------------------
+    const pen  = minD - dist;
+    const corr = Math.min(pen * 0.5, 6);
+    a.x -= nx * corr;  a.y -= ny * corr;
+    b.x += nx * corr;  b.y += ny * corr;
+
+    // --- normal impulse ------------------------------------------------
+    const ux = b.vx - a.vx;
+    const uy = b.vy - a.vy;
+    const un = ux * nx + uy * ny;
+    if (un > 0) return;                       // already separating
+
+    const e  = (un < -60) ? E_BALL : 0;       // no bouncing for tiny hits
+    const jn = -(1 + e) * un * 0.5;            // equal masses (m = 1)
+
+    a.vx -= jn * nx;  a.vy -= jn * ny;
+    b.vx += jn * nx;  b.vy += jn * ny;
+
+    // --- tangential impulse (gives the balls their spin) --------------
+    const tx = -ny, ty = nx;
+
+    // velocities of the two contact points (center + omega x r)
+    const avx = a.vx - a.va * a.r * ny;
+    const avy = a.vy + a.va * a.r * nx;
+    const bvx = b.vx + b.va * b.r * ny;
+    const bvy = b.vy - b.va * b.r * nx
